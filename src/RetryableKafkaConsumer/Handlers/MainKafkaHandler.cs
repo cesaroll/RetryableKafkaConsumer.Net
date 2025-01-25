@@ -30,8 +30,8 @@ internal class MainKafkaHandler<TKey, TValue> : IHandler<TKey, TValue>
         try
         {
             var result = await _payloadHandler.HandleAsync(consumeResult, ct);
-
-            if (result is SuccessResult or ErrorResult)
+            
+            if (result is SuccessResult)
                 return result;
             
             if (result is RetryResult)
@@ -39,14 +39,13 @@ internal class MainKafkaHandler<TKey, TValue> : IHandler<TKey, TValue>
             
             if (result is DlqResult)
                 return await _dlqProducer.ProduceAsync(consumeResult, ct);
-
-            return new ErrorResult("An unknown error occurred while handling the message");
         }
         catch (Exception ex)
         {
             var msg = "An error occurred while handling the message";
             _logger.LogError(ex, msg);
-            return new ErrorResult(msg, ex);
         }
+        
+        return await _retryProducer.ProduceAsync(consumeResult, ct);
     }
 }

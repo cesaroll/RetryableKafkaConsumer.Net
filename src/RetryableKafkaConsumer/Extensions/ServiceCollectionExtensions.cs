@@ -22,18 +22,14 @@ public static class ServiceCollectionExtensions
             opt.ServicesStopConcurrently = true;
         });
         
-        services.AddTransient<IHandler<TKey, TValue>>(provider => 
-            ActivatorUtilities.CreateInstance<THandler>(provider)
-        );
-        
         services.AddSingleton<IKafkaHandlerFactory<TKey, TValue>, KafkaHandlerFactory<TKey, TValue>>();
         services.AddSingleton<IKafkaConsumerFactory<TKey, TValue>, KafkaConsumerFactory<TKey,TValue>>();
         
         services.AddSingleton<IConsumerTaskFactory<TKey, TValue>>(provider => 
             ActivatorUtilities.CreateInstance<ConsumerTaskFactory<TKey, TValue>>(
                 provider,
-                config
-                //provider.GetRequiredService<IHandler<TKey, TValue>>()
+                config,
+                ActivatorUtilities.CreateInstance<THandler>(services.BuildServiceProvider())
                 )
         );
         
@@ -41,19 +37,6 @@ public static class ServiceCollectionExtensions
         
         services.AddHostedService<ConsumerHostedService<TKey, TValue>>();
 
-        return services;
-    }
-    
-    public static IServiceCollection RegisterTestHostedService(this IServiceCollection services)
-    {
-        services.Configure<HostOptions>(opt =>
-        {
-            opt.ServicesStartConcurrently = true;
-            opt.ServicesStopConcurrently = true;
-        });
-        
-        services.AddHostedService<TestHostedService>();
-        
         return services;
     }
 }

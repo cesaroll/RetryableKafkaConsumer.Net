@@ -10,15 +10,13 @@ public class TestHandler: IValueHandler<string>
     
     public TestHandler(ILogger<TestHandler> logger)
     {
-        Name = "Handler1";
         _logger = logger;
     }
-
-    public string Name { get; }
 
     public Task<Result> HandleAsync(ConsumeResult<Ignore, string> consumeResult, CancellationToken ct)
     {
         _logger.LogInformation("Handling message: {message}", consumeResult.Message.Value);
+        throw new Exception("Test exception");
         return Task.FromResult<Result>(new SuccessResult());
     }
 }

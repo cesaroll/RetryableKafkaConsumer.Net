@@ -9,18 +9,18 @@ internal class ConsumerTask<TKey, TValue> : IConsumerTask
 {
     private readonly string _topic;
     private readonly IConsumer<TKey, TValue> _kafkaConsumer;
-    private readonly IHandler<TKey, TValue> _payloadHandler;
+    private readonly IHandler<TKey, TValue> _kafkaHandler;
     private readonly ILogger _logger;
 
     public ConsumerTask(
         string topic, 
         IConsumer<TKey, TValue> kafkaConsumer, 
-        IHandler<TKey, TValue> payloadHandler, 
+        IHandler<TKey, TValue> kafkaHandler, 
         ILoggerFactory loggerFactory)
     {
         _topic = topic;
         _kafkaConsumer = kafkaConsumer;
-        _payloadHandler = payloadHandler;
+        _kafkaHandler = kafkaHandler;
         _logger = loggerFactory.CreateLogger<ConsumerTask<TKey, TValue>>();
     }
 
@@ -44,7 +44,7 @@ internal class ConsumerTask<TKey, TValue> : IConsumerTask
             try
             {
                 var consumeResult = _kafkaConsumer.Consume(ct);
-                var result = await _payloadHandler.HandleAsync(consumeResult, ct);
+                var result = await _kafkaHandler.HandleAsync(consumeResult, ct);
 
                 if (result is SuccessResult or RetryResult or DlqResult)
                 {

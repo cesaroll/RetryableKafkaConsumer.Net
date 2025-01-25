@@ -8,7 +8,6 @@ builder.Services.AddOpenApi();
 
 builder.Services.RegisterConsumers(builder.Configuration);
 
-
 var app = builder.Build();
 
 app.Run();

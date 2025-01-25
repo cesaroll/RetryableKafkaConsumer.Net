@@ -1,3 +1,3 @@
 namespace RetryableKafkaConsumer.Contracts.Results;
 
-public record RetryResult(string Message, Exception? Exception) : Result(Message, Exception);
+public record RetryResult(string? Message = null, Exception? Exception = null) : Result(Message, Exception);
