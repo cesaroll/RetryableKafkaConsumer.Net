@@ -1,0 +1,56 @@
+version: '3.8'
+
+services:
+  kafka-kraft:
+    image: confluentinc/cp-kafka:7.8.0
+    container_name: kafka-kraft
+    hostname: kafka-kraft
+    ports:
+      - "9101:9101" # JMX port
+      - "9092:9092" # External client port
+      - "29092:29092" # Internal broker port
+      - "29093:29093" # Controller port
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: 'CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT'
+      KAFKA_ADVERTISED_LISTENERS: 'PLAINTEXT://kafka-kraft:29092,PLAINTEXT_HOST://localhost:9092'
+      KAFKA_JMX_PORT: 9101
+      KAFKA_JMX_HOSTNAME: localhost
+      KAFKA_PROCESS_ROLES: 'broker,controller'
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_CONTROLLER_QUORUM_VOTERS: '1@kafka-kraft:29093'
+      KAFKA_LISTENERS: 'PLAINTEXT://kafka-kraft:29092,CONTROLLER://kafka-kraft:29093,PLAINTEXT_HOST://0.0.0.0:9092'
+      KAFKA_INTER_BROKER_LISTENER_NAME: 'PLAINTEXT'
+      KAFKA_CONTROLLER_LISTENER_NAMES: 'CONTROLLER'
+      CLUSTER_ID: 'MkU3OEVBNTcwNTJENDM2Qk'
+
+  kafka-init:
+    image: confluentinc/cp-kafka:7.8.0
+    container_name: kafka-init
+    hostname: kafka-init
+    depends_on:
+      kafka-kraft:
+        condition: service_started
+    command:
+      - /bin/bash
+      - -c
+      - |
+        echo "Waiting for Kafka to be ready..." &&
+        cub kafka-ready -b kafka-kraft:29092 1 20 &&
+        kafka-topics --bootstrap-server ${KAFKA_SERVER:-kafka-kraft:29092} --create --if-not-exists --topic test-topic --replication-factor 1 --partitions 1 &&
+        echo -e 'Successfully created the following topics:' &&
+        kafka-topics --bootstrap-server ${KAFKA_SERVER:-kafka-kraft:29092} --list
+
+  kafka-ui:
+    image: provectuslabs/kafka-ui:latest
+    container_name: kafka-ui
+    hostname: kafka-ui
+    ports:
+      - "8080:8080" # Kafka UI port
+    environment:
+      KAFKA_CLUSTERS_0_NAME: local
+      KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-kraft:29092
+      # KAFKA_CLUSTERS_0_ZOOKEEPER: "" # Leave empty for KRaft mode
+      # KAFKA_CLUSTERS_0_SCHEMAREGISTRY: "" # Optional, only if you're using Schema Registry
+    depends_on:
+      - kafka-kraft

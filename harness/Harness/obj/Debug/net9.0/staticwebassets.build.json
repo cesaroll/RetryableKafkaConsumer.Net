@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "gSPbgyQxIlVuc5hl3+Z8ToSWY3LW88e+/+3BDmvvS6Y=",
+  "Source": "Harness",
+  "BasePath": "_content/Harness",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
