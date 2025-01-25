@@ -50,20 +50,6 @@ internal class ConsumerTaskFactory<TKey, TValue> : IConsumerTaskFactory<TKey, TV
             kafkaHandler,
             _loggerFactory);
     }
-    
-    // private IConsumerTask CreateMainTaskConsumer(
-    //     RetryableConsumerConfig retryableConsumerConfig, 
-    //     IHandler<TKey, TValue> payloadHandler)
-    // {
-    //     var kafkaConsumer = _kafkaConsumerFactory.CreateKafkaConsumer(retryableConsumerConfig);
-    //     var kafkaHandler = _kafkaHandlerFactory.CreateMainHandler(payloadHandler);
-    //
-    //     return new ConsumerTask<TKey, TValue>(
-    //         retryableConsumerConfig.Topic,
-    //         kafkaConsumer,
-    //         kafkaHandler,
-    //         _loggerFactory);
-    // }
 
     private IConsumerTask CreateRetryTaskConsumer(
         RetryableConsumerConfig retryableConsumerConfig, 

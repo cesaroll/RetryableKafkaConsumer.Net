@@ -25,8 +25,6 @@ internal class MainKafkaHandler<TKey, TValue> : IHandler<TKey, TValue>
         _logger = loggerFactory.CreateLogger<MainKafkaHandler<TKey, TValue>>();
     }
 
-    public string Name { get; }
-
     public async Task<Result> HandleAsync(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct)
     {
         try
