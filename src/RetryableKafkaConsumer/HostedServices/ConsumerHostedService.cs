@@ -3,7 +3,7 @@ using RetryableKafkaConsumer.Consumers;
 
 namespace RetryableKafkaConsumer.HostedServices;
 
-internal class ConsumerHostedService<TKey, TValue> : BackgroundService
+internal class ConsumerHostedService<TKey, TValue> : IHostedService
 {
     private readonly List<IConsumerTask> _consumers;
     
@@ -11,10 +11,13 @@ internal class ConsumerHostedService<TKey, TValue> : BackgroundService
     {
         _consumers = consumerTaskFactory.CreateTaskConsumers();
     }
-    
-    protected override async Task ExecuteAsync(CancellationToken stoppingToken)
+
+    public async Task StartAsync(CancellationToken ct)
     {
-        var tasks = _consumers.Select(consumer => consumer.Run(stoppingToken));
-        await Task.Run(() => Task.WhenAll(tasks), stoppingToken);
+        var tasks = _consumers.Select(consumer => consumer.Run(ct));
+        await Task.Run(() => Task.WhenAll(tasks), ct);
     }
+
+    public Task StopAsync(CancellationToken cancellationToken)
+        => Task.CompletedTask;
 }
