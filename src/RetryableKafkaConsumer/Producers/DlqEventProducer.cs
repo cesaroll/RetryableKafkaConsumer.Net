@@ -1,12 +1,16 @@
 using Confluent.Kafka;
-using RetryableKafkaConsumer.Contracts.Results;
+using Microsoft.Extensions.Logging;
 
 namespace RetryableKafkaConsumer.Producers;
 
-internal class DlqEventProducer<TKey, TValue> : IEventProducer<TKey, TValue>
+internal class DlqEventProducer<TKey, TValue> : EventProducer<TKey, TValue>
 {
-    public Task<Result> ProduceAsync(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct)
+    public DlqEventProducer(
+        IProducer<TKey, TValue> producer, string topic, ILoggerFactory loggerFactory) : 
+        base(producer, topic, loggerFactory)
     {
-        throw new NotImplementedException();
     }
+
+    protected override ILogger CreateLogger(ILoggerFactory loggerFactory)
+        => loggerFactory.CreateLogger<DlqEventProducer<TKey, TValue>>();
 }
