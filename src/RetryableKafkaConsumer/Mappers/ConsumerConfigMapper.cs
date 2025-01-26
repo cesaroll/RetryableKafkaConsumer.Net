@@ -3,9 +3,9 @@ using RetryableKafkaConsumer.Contracts.Configs;
 
 namespace RetryableKafkaConsumer.Mappers;
 
-public static class ConsumerConfigMapper
+internal static class ConsumerConfigMapper
 {
-    public static ConsumerConfig ToConsumerConfig(this RetryableConsumerConfig config)
+    internal static ConsumerConfig ToConsumerConfig(this RetryableConsumerConfig config)
     {
         return new ConsumerConfig
         {

@@ -9,14 +9,14 @@ namespace RetryableKafkaConsumer.Handlers;
 internal class MainKafkaHandler<TKey, TValue> : IHandler<TKey, TValue>
 {
     private readonly IHandler<TKey, TValue> _payloadHandler;
-    private readonly IEventProducer _retryProducer;
-    private readonly IEventProducer _dlqProducer;
+    private readonly IEventProducer<TKey, TValue> _retryProducer;
+    private readonly IEventProducer<TKey, TValue> _dlqProducer;
     private readonly ILogger<MainKafkaHandler<TKey, TValue>> _logger;
     
     public MainKafkaHandler(
         IHandler<TKey, TValue> payloadHandler, 
-        IEventProducer retryProducer, 
-        IEventProducer dlqProducer,
+        IEventProducer<TKey, TValue> retryProducer, 
+        IEventProducer<TKey, TValue> dlqProducer,
         ILoggerFactory loggerFactory)
     {
         _payloadHandler = payloadHandler;

@@ -5,7 +5,7 @@ using RetryableKafkaConsumer.Handlers;
 
 namespace RetryableKafkaConsumer.Consumers;
 
-internal class ConsumerTaskFactory<TKey, TValue> : IConsumerTaskFactory<TKey, TValue>
+internal class ConsumerTaskFactory<TKey, TValue> : IConsumerTaskFactory
 {
     private readonly RetryableConsumerConfig _retryableConsumerConfig;
     private readonly IHandler<TKey, TValue> _payloadHandler;

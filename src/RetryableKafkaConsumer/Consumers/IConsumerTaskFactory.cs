@@ -3,7 +3,7 @@ using RetryableKafkaConsumer.Contracts.Handlers;
 
 namespace RetryableKafkaConsumer.Consumers;
 
-internal interface IConsumerTaskFactory<TKey, TValue>
+internal interface IConsumerTaskFactory
 {
     List<IConsumerTask> CreateTaskConsumers();
 }

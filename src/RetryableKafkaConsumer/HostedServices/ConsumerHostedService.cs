@@ -7,7 +7,7 @@ internal class ConsumerHostedService<TKey, TValue> : BackgroundService
 {
     private readonly List<IConsumerTask> _consumers;
     
-    public ConsumerHostedService(IConsumerTaskFactory<TKey, TValue> consumerTaskFactory)
+    public ConsumerHostedService(IConsumerTaskFactory consumerTaskFactory)
     {
         _consumers = consumerTaskFactory.CreateTaskConsumers();
     }

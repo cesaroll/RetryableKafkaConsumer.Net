@@ -3,9 +3,9 @@ using RetryableKafkaConsumer.Contracts.Results;
 
 namespace RetryableKafkaConsumer.Producers;
 
-internal class DlqEventProducer : IEventProducer
+internal class DlqEventProducer<TKey, TValue> : IEventProducer<TKey, TValue>
 {
-    public Task<Result> ProduceAsync<TKey, TValue>(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct)
+    public Task<Result> ProduceAsync(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct)
     {
         throw new NotImplementedException();
     }
