@@ -27,7 +27,6 @@ public static class ServiceCollectionExtensions
         services.AddSingleton<ISerializer<TKey>>(new JsonSerializer<TKey>());
         services.AddSingleton<ISerializer<TValue>>(new JsonSerializer<TValue>());
         
-        // services.AddSingleton<IEventProducer<TKey, TValue>, RetryEventProducer<TKey, TValue>>();
         services.AddSingleton<IProducerFactory<TKey, TValue>, ProducerFactory<TKey, TValue>>();
         
         services.AddSingleton<IKafkaHandlerFactory<TKey, TValue>, KafkaHandlerFactory<TKey, TValue>>();

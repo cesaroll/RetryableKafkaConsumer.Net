@@ -15,8 +15,19 @@ public class TestHandler: IValueHandler<string>
 
     public Task<Result> HandleAsync(ConsumeResult<Ignore, string> consumeResult, CancellationToken ct)
     {
-        _logger.LogInformation("Handling message: {message}", consumeResult.Message.Value);
-        throw new Exception("Test exception");
+        var value = consumeResult.Message.Value;
+        
+        _logger.LogInformation("Handling message: {message}", value);
+
+        if (value.Contains("retry"))
+            return Task.FromResult<Result>(new RetryResult());
+        
+        if (value.Contains("dlq"))
+            return Task.FromResult<Result>(new DlqResult());
+        
+        if (value.Contains("exception"))
+            throw new Exception("A test exception from payload handler");
+        
         return Task.FromResult<Result>(new SuccessResult());
     }
 }

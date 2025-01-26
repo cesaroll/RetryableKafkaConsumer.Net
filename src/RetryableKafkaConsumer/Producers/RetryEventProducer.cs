@@ -13,22 +13,11 @@ internal class RetryEventProducer<TKey, TValue> : IEventProducer<TKey, TValue>
     public RetryEventProducer(
         IProducer<TKey, TValue> producer,
         string topic,
-        // ISerializer<TKey> keySerializer,
-        // ISerializer<TValue> valueSerializer,
         ILoggerFactory loggerFactory)
     {
         _producer = producer;
         _topic = topic;
         _logger = loggerFactory.CreateLogger<RetryEventProducer<TKey, TValue>>();
-
-        // _topic = "test-topic-retry1";
-        // _producer = new ProducerBuilder<TKey, TValue>(new ProducerConfig
-        //     {
-        //         BootstrapServers = "localhost:9092"
-        //     })
-        //     .SetKeySerializer(keySerializer)
-        //     .SetValueSerializer(valueSerializer)
-        //     .Build();
     }
 
 

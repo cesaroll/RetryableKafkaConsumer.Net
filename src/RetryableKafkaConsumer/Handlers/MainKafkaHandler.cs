@@ -9,14 +9,14 @@ namespace RetryableKafkaConsumer.Handlers;
 internal class MainKafkaHandler<TKey, TValue> : IHandler<TKey, TValue>
 {
     private readonly IHandler<TKey, TValue> _payloadHandler;
-    private readonly IEventProducer<TKey, TValue> _retryProducer;
-    private readonly IEventProducer<TKey, TValue> _dlqProducer;
+    private readonly IEventProducer<TKey, TValue>? _retryProducer;
+    private readonly IEventProducer<TKey, TValue>? _dlqProducer;
     private readonly ILogger<MainKafkaHandler<TKey, TValue>> _logger;
     
     public MainKafkaHandler(
         IHandler<TKey, TValue> payloadHandler, 
-        IEventProducer<TKey, TValue> retryProducer, 
-        IEventProducer<TKey, TValue> dlqProducer,
+        IEventProducer<TKey, TValue>? retryProducer, 
+        IEventProducer<TKey, TValue>? dlqProducer,
         ILoggerFactory loggerFactory)
     {
         _payloadHandler = payloadHandler;
@@ -29,23 +29,49 @@ internal class MainKafkaHandler<TKey, TValue> : IHandler<TKey, TValue>
     {
         try
         {
-            var result = await _payloadHandler.HandleAsync(consumeResult, ct);
+            var result = await TryHanldeAsync(consumeResult, ct);
             
-            if (result is SuccessResult)
-                return result;
-            
-            if (result is RetryResult)
-                return await _retryProducer.ProduceAsync(consumeResult, ct);
-            
-            if (result is DlqResult)
-                return await _dlqProducer.ProduceAsync(consumeResult, ct);
+            switch (result)
+            {
+                case RetryResult when _retryProducer != null:
+                    return await _retryProducer.ProduceAsync(consumeResult, ct);
+                default:
+                    return result;
+            }
         }
         catch (Exception ex)
         {
             var msg = "An error occurred while handling the message";
             _logger.LogError(ex, msg);
+            throw;
         }
-        
-        return await _retryProducer.ProduceAsync(consumeResult, ct);
+    }
+
+    private async Task<Result> TryHanldeAsync(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct)
+    {
+        try
+        {
+            var result = await _payloadHandler.HandleAsync(consumeResult, ct);
+            
+            switch (result)
+            {
+                case SuccessResult:
+                    return result;
+                case RetryResult when _retryProducer != null:
+                    return await _retryProducer.ProduceAsync(consumeResult, ct);
+                case DlqResult when _dlqProducer != null:
+                    return await _dlqProducer.ProduceAsync(consumeResult, ct);
+                case DlqResult:
+                    return result;
+            }
+        }
+        catch (Exception ex)
+        {
+            var msg = "An error occurred while handling the message";
+            _logger.LogError(ex, msg);
+            return new RetryResult(msg, ex);
+        }
+
+        return new RetryResult();
     }
 }

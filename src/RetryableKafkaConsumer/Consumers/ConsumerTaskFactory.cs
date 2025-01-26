@@ -42,7 +42,7 @@ internal class ConsumerTaskFactory<TKey, TValue> : IConsumerTaskFactory
     private IConsumerTask CreateMainTaskConsumer()
     {
         var kafkaConsumer = _kafkaConsumerFactory.CreateKafkaConsumer(_retryableConsumerConfig);
-        var kafkaHandler = _kafkaHandlerFactory.CreateMainHandler(_payloadHandler);
+        var kafkaHandler = _kafkaHandlerFactory.CreateMainHandler(_payloadHandler, _retryableConsumerConfig);
     
         return new ConsumerTask<TKey, TValue>(
             _retryableConsumerConfig.Topic,

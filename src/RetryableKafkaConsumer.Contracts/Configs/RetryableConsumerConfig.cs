@@ -1,9 +1,11 @@
 namespace RetryableKafkaConsumer.Contracts.Configs;
 
-public record RetryableConsumerConfig(
-    string Topic,
-    string GroupId,
-    string Server,
-    List<RetryConfig> Retries
-    // DlqConfig Dlq
-);
+public class RetryableConsumerConfig
+{
+    public required string Topic { get; init; }
+    public required string GroupId { get; init; }
+    public required string Server { get; init; }
+    public List<RetryConfig> Retries { get; init; } = new();
+
+    // public DlqConfig Dlq { get; init; }
+}
