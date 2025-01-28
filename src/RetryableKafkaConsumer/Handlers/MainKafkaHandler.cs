@@ -34,7 +34,9 @@ internal class MainKafkaHandler<TKey, TValue> : IHandler<TKey, TValue>
             switch (result)
             {
                 case RetryResult when _retryProducer != null:
-                    return await _retryProducer.ProduceAsync(consumeResult, ct);
+                    return await _retryProducer.ProduceAsync(consumeResult.Message, ct);
+                case RetryResult when _dlqProducer != null:
+                    return await _dlqProducer.ProduceAsync(consumeResult.Message, ct);
                 default:
                     return result;
             }
@@ -58,9 +60,9 @@ internal class MainKafkaHandler<TKey, TValue> : IHandler<TKey, TValue>
                 case SuccessResult:
                     return result;
                 case RetryResult when _retryProducer != null:
-                    return await _retryProducer.ProduceAsync(consumeResult, ct);
+                    return await _retryProducer.ProduceAsync(consumeResult.Message, ct);
                 case DlqResult when _dlqProducer != null:
-                    return await _dlqProducer.ProduceAsync(consumeResult, ct);
+                    return await _dlqProducer.ProduceAsync(consumeResult.Message, ct);
                 case DlqResult:
                     return result;
             }

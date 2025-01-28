@@ -1,11 +1,10 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using RetryableKafkaConsumer.Contracts.Results;
-using RetryableKafkaConsumer.Mappers;
 
 namespace RetryableKafkaConsumer.Producers;
 
-internal abstract class EventProducer<TKey, TValue> : IEventProducer<TKey, TValue>
+internal class EventProducer<TKey, TValue> : IEventProducer<TKey, TValue>
 {
     private readonly IProducer<TKey, TValue> _producer;
     private readonly string _topic;
@@ -18,20 +17,14 @@ internal abstract class EventProducer<TKey, TValue> : IEventProducer<TKey, TValu
     {
         _producer = producer;
         _topic = topic;
-        _logger = CreateLogger(loggerFactory);
+        _logger = loggerFactory.CreateLogger<EventProducer<TKey, TValue>>();
     }
     
-    protected abstract ILogger CreateLogger(ILoggerFactory loggerFactory);
-    
-    public async Task<Result> ProduceAsync(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct)
+    public async Task<Result> ProduceAsync(Message<TKey, TValue> message, CancellationToken ct)
     {
-        var message = consumeResult.ToMessage();
-        
-        message.Headers = AddHeaders(consumeResult);
-        
         try
         {
-            await _producer.ProduceAsync(_topic, message, ct);
+            await _producer.ProduceAsync(_topic, message, ct); // TODO: Add retries
             _logger.LogInformation($"Produced message to topic: {_topic}");
             return new SuccessResult();
             
@@ -41,7 +34,4 @@ internal abstract class EventProducer<TKey, TValue> : IEventProducer<TKey, TValu
             throw;
         }
     }
-
-    protected virtual Headers AddHeaders(ConsumeResult<TKey, TValue> consumeResult)
-        => consumeResult.Message.Headers;
 }

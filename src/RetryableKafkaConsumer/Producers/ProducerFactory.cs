@@ -1,6 +1,7 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using RetryableKafkaConsumer.Mappers;
+using ProducerConfig = RetryableKafkaConsumer.Producers.Config.ProducerConfig;
 
 namespace RetryableKafkaConsumer.Producers;
 
@@ -21,13 +22,13 @@ internal class ProducerFactory<TKey, TValue> : IProducerFactory<TKey, TValue>
         _loggerFactory = loggerFactory;
     }
 
-    public IEventProducer<TKey, TValue> CreateRetryProducer(RetryableProducerConfig retryableProducerConfig)
+    public IEventProducer<TKey, TValue> CreateProducer(ProducerConfig producerConfig)
     {
-        var producer = new ProducerBuilder<TKey, TValue>(retryableProducerConfig.ToProducerConfig())
+        var producer = new ProducerBuilder<TKey, TValue>(producerConfig.ToProducerConfig())
             .SetKeySerializer(_keySerializer)
             .SetValueSerializer(_valueSerializer)
             .Build();
         
-        return new RetryEventProducer<TKey, TValue>(producer, retryableProducerConfig.Topic, _loggerFactory);
+        return new EventProducer<TKey, TValue>(producer, producerConfig.Topic, _loggerFactory);
     }
 }

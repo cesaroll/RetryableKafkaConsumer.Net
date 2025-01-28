@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using RetryableKafkaConsumer.Contracts.Configs;
 using RetryableKafkaConsumer.Mappers;
 
-namespace RetryableKafkaConsumer.Consumers;
+namespace RetryableKafkaConsumer.Consumers.Kafka;
 
 internal class KafkaConsumerFactory<TKey, TValue> : IKafkaConsumerFactory<TKey, TValue>
 {
@@ -17,9 +17,12 @@ internal class KafkaConsumerFactory<TKey, TValue> : IKafkaConsumerFactory<TKey, 
         _loggerFactory = loggerFactory;
     }
 
-    public IConsumer<TKey, TValue> CreateKafkaConsumer(RetryableConsumerConfig retryableConsumerConfig)
+    public IConsumer<TKey, TValue> CreateKafkaConsumer(ConsumerConfig config)
     {
-        var builder = new ConsumerBuilder<TKey, TValue>(retryableConsumerConfig.ToConsumerConfig());
+        config.EnableAutoCommit = false;
+        config.AutoOffsetReset = AutoOffsetReset.Earliest;
+        
+        var builder = new ConsumerBuilder<TKey, TValue>(config);
         // TODO: Log handlers and others
         return builder.Build();
     }

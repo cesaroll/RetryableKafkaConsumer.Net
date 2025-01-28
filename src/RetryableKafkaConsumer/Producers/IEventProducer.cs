@@ -5,5 +5,5 @@ namespace RetryableKafkaConsumer.Producers;
 
 internal interface IEventProducer<TKey, TValue>
 {
-    Task<Result> ProduceAsync(ConsumeResult<TKey, TValue> consumeResult, CancellationToken ct);
+    Task<Result> ProduceAsync(Message<TKey, TValue> message, CancellationToken ct);
 }

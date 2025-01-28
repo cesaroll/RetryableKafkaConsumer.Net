@@ -1,3 +1,6 @@
 namespace RetryableKafkaConsumer.Contracts.Configs;
 
-public record DlqConfig();
+public class DlqConfig
+{
+    public string? Topic { get; init; }
+}

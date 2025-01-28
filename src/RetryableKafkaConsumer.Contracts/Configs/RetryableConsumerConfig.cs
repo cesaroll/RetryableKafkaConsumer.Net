@@ -7,5 +7,5 @@ public class RetryableConsumerConfig
     public required string Server { get; init; }
     public List<RetryConfig> Retries { get; init; } = new();
 
-    // public DlqConfig Dlq { get; init; }
+    public DlqConfig? Dlq { get; init; }
 }

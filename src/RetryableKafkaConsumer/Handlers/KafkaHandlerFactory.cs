@@ -2,6 +2,7 @@ using Microsoft.Extensions.Logging;
 using RetryableKafkaConsumer.Contracts.Configs;
 using RetryableKafkaConsumer.Contracts.Handlers;
 using RetryableKafkaConsumer.Producers;
+using RetryableKafkaConsumer.Producers.Config;
 
 namespace RetryableKafkaConsumer.Handlers;
 
@@ -43,6 +44,7 @@ internal class KafkaHandlerFactory<TKey, TValue> : IKafkaHandlerFactory<TKey, TV
         => config.Retries.FirstOrDefault() != null 
             ? CreateRetryProducer(config.Retries.FirstOrDefault()!.Topic, config)
             : null;
+    
     private IEventProducer<TKey, TValue>? CreateRetryProducer(string topic, RetryableConsumerConfig config)
     {
         var retryConfig = config.Retries.FirstOrDefault(x => x.Topic == topic);
@@ -52,7 +54,7 @@ internal class KafkaHandlerFactory<TKey, TValue> : IKafkaHandlerFactory<TKey, TV
         
         var server = retryConfig.Server?? config.Server;
         
-        return _producerFactory.CreateRetryProducer(
-            new RetryableProducerConfig(server, topic));
+        return _producerFactory.CreateProducer(
+            new ProducerConfig(server, topic));
     }
 }

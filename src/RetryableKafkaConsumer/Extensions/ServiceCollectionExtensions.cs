@@ -2,6 +2,7 @@ using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using RetryableKafkaConsumer.Consumers;
+using RetryableKafkaConsumer.Consumers.Kafka;
 using RetryableKafkaConsumer.Contracts.Configs;
 using RetryableKafkaConsumer.Contracts.Handlers;
 using RetryableKafkaConsumer.Handlers;
@@ -43,6 +44,21 @@ public static class ServiceCollectionExtensions
         
         services.AddHostedService<ConsumerHostedService<TKey, TValue>>();
 
+        PrintRegisteredServices(services);
+        
         return services;
+    }
+
+    private static void PrintRegisteredServices(IServiceCollection services)
+    {
+        foreach (var service in services)
+        {
+            if (service.ServiceType.Namespace != null && 
+                (service.ServiceType.Namespace.StartsWith("Microsoft") || 
+                 service.ServiceType.Namespace.StartsWith("System")))
+            continue;
+            
+            Console.WriteLine($"  {service.ServiceType.Name,-30} -> {service.ImplementationType?.Name, -30} as {service.Lifetime} -> {service.ServiceType.Namespace}");
+        }
     }
 }
