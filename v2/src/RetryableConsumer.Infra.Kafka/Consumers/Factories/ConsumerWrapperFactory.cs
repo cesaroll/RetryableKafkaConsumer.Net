@@ -30,6 +30,7 @@ public class ConsumerWrapperFactory<TKey, TValue> : IConsumerWrapperFactory<TKey
             .SetValueDeserializer(_valueDeserializer)
             .Build();
         
-        return new ConsumerWrapper<TKey, TValue>(config.RegistrationId, config.Topic, consumer);
+        return new ConsumerWrapper<TKey, TValue>(
+            config.RegistrationId, config.Topic, config.RetryDelay, config.RetryAttempts, consumer);
     }
 }

@@ -31,7 +31,9 @@ public static class ServiceCollectionExtensions
                     config.Id,
                     retry.Host,
                     retry.Topic,
-                    retry.GroupId
+                    retry.GroupId,
+                    retry.Delay,
+                    retry.Attempts
                 )));
         }
         

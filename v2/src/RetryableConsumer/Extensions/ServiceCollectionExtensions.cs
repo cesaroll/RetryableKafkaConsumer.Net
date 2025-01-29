@@ -6,7 +6,9 @@ using RetryableConsumer.Abstractions.Handlers;
 using RetryableConsumer.Infra.Kafka.Consumers.Extensions;
 using RetryableConsumer.Infra.Kafka.Producers.Extensions;
 using RetryableConsumer.Mapper;
+using RetryableConsumer.Processor.Factories;
 using RetryableConsumer.Serializers;
+using RetryableConsumer.Services;
 using Config = RetryableConsumer.Abstractions.Configs.Config;
 
 namespace RetryableConsumer.Extensions;
@@ -32,6 +34,13 @@ public static class ServiceCollectionExtensions
 
         services.RegisterProducerServices<TKey, TValue>(registrationConfig);
         services.RegisterConsumerServices<TKey, TValue>(registrationConfig);
+        
+        services.AddSingleton<IProcessorFactory, ProcessorFactory<TKey, TValue, THandler>>();
+
+        services.AddHostedService(provider => 
+            ActivatorUtilities.CreateInstance<ConsumerHostedService>(
+                provider, 
+                registrationConfig));
 
         return services;
     }

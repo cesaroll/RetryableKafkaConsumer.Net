@@ -8,6 +8,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\RetryableConsumer.Infra.Kafka\RetryableConsumer.Infra.Kafka.csproj" />
+      <ProjectReference Include="..\RetryableConsumer.Processor\RetryableConsumer.Processor.csproj" />
     </ItemGroup>
 
     <ItemGroup>

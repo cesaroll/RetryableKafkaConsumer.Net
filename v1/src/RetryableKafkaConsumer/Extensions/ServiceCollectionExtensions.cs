@@ -34,7 +34,7 @@ public static class ServiceCollectionExtensions
         
         services.AddSingleton<IKafkaConsumerFactory<TKey, TValue>, KafkaConsumerFactory<TKey,TValue>>();
         
-        services.AddSingleton<IConssumerTaskFactory>(provider => 
+        services.AddSingleton<IConsumerTaskFactory>(provider => 
             ActivatorUtilities.CreateInstance<ConsumerTaskFactory<TKey, TValue>>(
                 provider,
                 config,
