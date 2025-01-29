@@ -1,0 +1,56 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{F02A6F00-7D81-411A-9604-5BC67FE2D8A9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryableConsumer", "src\RetryableConsumer\RetryableConsumer.csproj", "{C996648A-54E8-4592-A7E9-AD6CE2A1D99C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryableConsumer.Infra.Kafka", "src\RetryableConsumer.Infra.Kafka\RetryableConsumer.Infra.Kafka.csproj", "{96F159DC-887F-4A63-A8F3-B555970884C2}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryableConsumer.Domain", "src\RetryableConsumer.Domain\RetryableConsumer.Domain.csproj", "{65684B32-B2B7-4C7F-838F-D97C5FA32470}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryableConsumer.Task", "src\RetryableConsumer.Task\RetryableConsumer.Task.csproj", "{6FB4889D-9B49-4396-AA91-90F16DD3B3AF}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryableConsumer.Handler", "src\RetryableConsumer.Handler\RetryableConsumer.Handler.csproj", "{A5992A1F-1056-4907-A787-D1E57676B065}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryableConsumer.Abstractions", "src\RetryableConsumer.Abstractions\RetryableConsumer.Abstractions.csproj", "{70460292-8DE4-479C-9823-FE675CBD0451}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{C996648A-54E8-4592-A7E9-AD6CE2A1D99C} = {F02A6F00-7D81-411A-9604-5BC67FE2D8A9}
+		{96F159DC-887F-4A63-A8F3-B555970884C2} = {F02A6F00-7D81-411A-9604-5BC67FE2D8A9}
+		{65684B32-B2B7-4C7F-838F-D97C5FA32470} = {F02A6F00-7D81-411A-9604-5BC67FE2D8A9}
+		{6FB4889D-9B49-4396-AA91-90F16DD3B3AF} = {F02A6F00-7D81-411A-9604-5BC67FE2D8A9}
+		{A5992A1F-1056-4907-A787-D1E57676B065} = {F02A6F00-7D81-411A-9604-5BC67FE2D8A9}
+		{70460292-8DE4-479C-9823-FE675CBD0451} = {F02A6F00-7D81-411A-9604-5BC67FE2D8A9}
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{C996648A-54E8-4592-A7E9-AD6CE2A1D99C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C996648A-54E8-4592-A7E9-AD6CE2A1D99C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C996648A-54E8-4592-A7E9-AD6CE2A1D99C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C996648A-54E8-4592-A7E9-AD6CE2A1D99C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{96F159DC-887F-4A63-A8F3-B555970884C2}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{96F159DC-887F-4A63-A8F3-B555970884C2}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{96F159DC-887F-4A63-A8F3-B555970884C2}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{96F159DC-887F-4A63-A8F3-B555970884C2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{65684B32-B2B7-4C7F-838F-D97C5FA32470}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{65684B32-B2B7-4C7F-838F-D97C5FA32470}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{65684B32-B2B7-4C7F-838F-D97C5FA32470}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{65684B32-B2B7-4C7F-838F-D97C5FA32470}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6FB4889D-9B49-4396-AA91-90F16DD3B3AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6FB4889D-9B49-4396-AA91-90F16DD3B3AF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6FB4889D-9B49-4396-AA91-90F16DD3B3AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6FB4889D-9B49-4396-AA91-90F16DD3B3AF}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A5992A1F-1056-4907-A787-D1E57676B065}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A5992A1F-1056-4907-A787-D1E57676B065}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A5992A1F-1056-4907-A787-D1E57676B065}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A5992A1F-1056-4907-A787-D1E57676B065}.Release|Any CPU.Build.0 = Release|Any CPU
+		{70460292-8DE4-479C-9823-FE675CBD0451}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{70460292-8DE4-479C-9823-FE675CBD0451}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{70460292-8DE4-479C-9823-FE675CBD0451}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{70460292-8DE4-479C-9823-FE675CBD0451}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
