@@ -9,7 +9,7 @@ public interface IConsumerWrapper<TKey, TValue>
     TimeSpan? RetryDelay { get;}
     int? RetryAttempts { get;}
     public void Subscribe();
-    public ConsumeResult<TKey, TValue> Consume(CancellationToken ct);
+    public Task<ConsumeResult<TKey, TValue>> ConsumeAsync(CancellationToken ct);
     public void Commit();
     public void Close();
 }

@@ -15,13 +15,13 @@ public class ProcessorFactory<TKey, TValue, THandler> :
     IProcessorFactory
     where THandler : IHandler<TKey, TValue>
 {
-    private readonly ServiceProvider _serviceProvider;
+    private readonly IServiceProvider _serviceProvider;
     private readonly IProducerStrategy<TKey, TValue> _producerStrategy;
     private readonly IConsumerStrategy<TKey, TValue> _consumerStrategy;
     private readonly ILoggerFactory _loggerFactory;
     
     public ProcessorFactory(
-        ServiceProvider serviceProvider,
+        IServiceProvider serviceProvider,
         IProducerStrategy<TKey, TValue> producerStrategy,
         IConsumerStrategy<TKey, TValue> consumerStrategy,
         ILoggerFactory loggerFactory

@@ -12,6 +12,10 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryableConsumer.Abstracti
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryableConsumer.Processor", "src\RetryableConsumer.Processor\RetryableConsumer.Processor.csproj", "{FD610AE8-66D7-4056-B1AB-3A33DBBF5E4C}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "harness", "harness", "{A58BCBB7-9AA2-4A13-8682-5CBE35F24D1B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Harness", "harness\Harness\Harness.csproj", "{A3BFA618-94AC-4030-BB79-59C3600644D6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -23,6 +27,7 @@ Global
 		{65684B32-B2B7-4C7F-838F-D97C5FA32470} = {F02A6F00-7D81-411A-9604-5BC67FE2D8A9}
 		{70460292-8DE4-479C-9823-FE675CBD0451} = {F02A6F00-7D81-411A-9604-5BC67FE2D8A9}
 		{FD610AE8-66D7-4056-B1AB-3A33DBBF5E4C} = {F02A6F00-7D81-411A-9604-5BC67FE2D8A9}
+		{A3BFA618-94AC-4030-BB79-59C3600644D6} = {A58BCBB7-9AA2-4A13-8682-5CBE35F24D1B}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C996648A-54E8-4592-A7E9-AD6CE2A1D99C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -45,5 +50,9 @@ Global
 		{FD610AE8-66D7-4056-B1AB-3A33DBBF5E4C}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{FD610AE8-66D7-4056-B1AB-3A33DBBF5E4C}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{FD610AE8-66D7-4056-B1AB-3A33DBBF5E4C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3BFA618-94AC-4030-BB79-59C3600644D6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3BFA618-94AC-4030-BB79-59C3600644D6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3BFA618-94AC-4030-BB79-59C3600644D6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3BFA618-94AC-4030-BB79-59C3600644D6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

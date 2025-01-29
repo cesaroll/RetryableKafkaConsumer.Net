@@ -39,6 +39,8 @@ services:
         cub kafka-ready -b kafka-kraft:29092 1 20 &&
         kafka-topics --bootstrap-server ${KAFKA_SERVER:-kafka-kraft:29092} --create --if-not-exists --topic test-topic        --replication-factor 1 --partitions 1 &&
         kafka-topics --bootstrap-server ${KAFKA_SERVER:-kafka-kraft:29092} --create --if-not-exists --topic test-topic-retry1 --replication-factor 1 --partitions 1 &&
+        kafka-topics --bootstrap-server ${KAFKA_SERVER:-kafka-kraft:29092} --create --if-not-exists --topic test-topic-retry2 --replication-factor 1 --partitions 1 &&
+        kafka-topics --bootstrap-server ${KAFKA_SERVER:-kafka-kraft:29092} --create --if-not-exists --topic test-topic-dlq    --replication-factor 1 --partitions 1 &&
         echo -e 'Successfully created the following topics:' &&
         kafka-topics --bootstrap-server ${KAFKA_SERVER:-kafka-kraft:29092} --list
 

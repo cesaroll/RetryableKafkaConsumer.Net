@@ -29,6 +29,8 @@ public static class ServiceCollectionExtensions
 
         services.TryAddSingleton<ISerializer<TKey>>(new JsonSerializer<TKey>());
         services.TryAddSingleton<ISerializer<TValue>>(new JsonSerializer<TValue>());
+        services.TryAddSingleton<IDeserializer<TKey>>(new JsonSerializer<TKey>());
+        services.TryAddSingleton<IDeserializer<TValue>>(new JsonSerializer<TValue>());
 
         var registrationConfig = config.ToRegistrationConfig(registrationId);
 

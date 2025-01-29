@@ -26,8 +26,8 @@ public class ConsumerWrapperFactory<TKey, TValue> : IConsumerWrapperFactory<TKey
                 AutoOffsetReset = AutoOffsetReset.Earliest,
                 EnableAutoCommit = false
             })
-            .SetKeyDeserializer(_keyDeserializer)
-            .SetValueDeserializer(_valueDeserializer)
+            // .SetKeyDeserializer(_keyDeserializer)
+            // .SetValueDeserializer(_valueDeserializer)
             .Build();
         
         return new ConsumerWrapper<TKey, TValue>(

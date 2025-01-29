@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RetryableConsumer.Domain.Configs;
 using RetryableConsumer.Infra.Kafka.Consumers.Config;
 using RetryableConsumer.Infra.Kafka.Consumers.Factories;
+using RetryableConsumer.Infra.Kafka.Consumers.Strategy;
 
 namespace RetryableConsumer.Infra.Kafka.Consumers.Extensions;
 
@@ -36,6 +37,8 @@ public static class ServiceCollectionExtensions
                     retry.Attempts
                 )));
         }
+
+        services.AddSingleton<IConsumerStrategy<TKey, TValue>, ConsumerStrategy<TKey, TValue>>();
         
         return services;
     }

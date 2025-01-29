@@ -31,21 +31,30 @@ public class RetryTopicProcessor<TKey, TValue> : Processor<TKey, TValue>
     {
         var localRetryCount = message.GetLocalRetryCountHeader();
         var overallRetryCount = message.GetOverallRetryCountHeader();
-
+        
+        var newMessage = new Message<TKey, TValue>
+        {
+            Key = message.Key,
+            Value = message.Value,
+            Headers = message.Headers
+        };
+        
+        newMessage.SetLocalRetryCountHeader(localRetryCount + 1);
+        newMessage.SetOverallRetryCountHeader(overallRetryCount + 1);
+        
         var producer = GetProducer();
         
-        message.SetLocalRetryCountHeader(localRetryCount + 1);
-        message.SetOverallRetryCountHeader(overallRetryCount + 1);
-        
         if (producer != null)
-            return await producer.ProduceAsync(message, ct);
+            return await producer.ProduceAsync(newMessage, ct);
     
-        return await TryDlq(message, ct);
+        return await TryDlq(newMessage, ct);
 
         IProducerWrapper<TKey, TValue>? GetProducer()
         {
             if (localRetryCount < _consumer.RetryAttempts)
                 return _currentRetryProducer;
+            
+            newMessage.SetLocalRetryCountHeader(0);
             
             return _retryProducer;
         }

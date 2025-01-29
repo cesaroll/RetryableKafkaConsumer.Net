@@ -29,8 +29,8 @@ public class ConsumerWrapper<TKey, TValue> : IConsumerWrapper<TKey, TValue>
     public void Subscribe()
         => _consumer.Subscribe(Topic);
 
-    public ConsumeResult<TKey, TValue> Consume(CancellationToken ct)
-        => _consumer.Consume(ct);
+    public async Task<ConsumeResult<TKey, TValue>> ConsumeAsync(CancellationToken ct)
+        => await Task.Run(() => _consumer.Consume(ct), ct);
     
     public void Commit()
         => _consumer.Commit();

@@ -44,7 +44,7 @@ public abstract class Processor<TKey, TValue> : IProcessor
         {
             try
             {
-                var consumeResult = _consumer.Consume(ct);
+                var consumeResult = await _consumer.ConsumeAsync(ct);
                 await BeforeHandleAsync(consumeResult, ct);
                 var result = await TryHandleAsync(consumeResult, ct);
 

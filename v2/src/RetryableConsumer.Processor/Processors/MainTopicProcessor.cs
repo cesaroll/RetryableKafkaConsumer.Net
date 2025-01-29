@@ -25,12 +25,19 @@ public class MainTopicProcessor<TKey, TValue> : Processor<TKey, TValue>
     
     protected override async Task<Result> TryRetry(Message<TKey, TValue> message, CancellationToken ct)
     {
-        message.SetLocalRetryCountHeader(0);
-        message.SetOverallRetryCountHeader(0);
+        var newMessage = new Message<TKey, TValue>
+        {
+            Key = message.Key,
+            Value = message.Value,
+            Headers = message.Headers
+        };
+        
+        newMessage.SetLocalRetryCountHeader(1);
+        newMessage.SetOverallRetryCountHeader(1);
         
         if (_retryProducer != null)
-            return await _retryProducer.ProduceAsync(message, ct);
+            return await _retryProducer.ProduceAsync(newMessage, ct);
     
-        return await TryDlq(message, ct);
+        return await TryDlq(newMessage, ct);
     }
 }

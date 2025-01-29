@@ -2,6 +2,7 @@ using Microsoft.Extensions.DependencyInjection;
 using RetryableConsumer.Domain.Configs;
 using RetryableConsumer.Infra.Kafka.Producers.Config;
 using RetryableConsumer.Infra.Kafka.Producers.Factories;
+using RetryableConsumer.Infra.Kafka.Producers.Strategy;
 
 namespace RetryableConsumer.Infra.Kafka.Producers.Extensions;
 
@@ -37,6 +38,8 @@ public static class ServiceCollectionExtensions
                     config.Dlq.InfraRetries
                 )));
         }
+        
+        services.AddSingleton<IProducerStrategy<TKey, TValue>, ProducerStrategy<TKey, TValue>>();
         
         return services;
     }
