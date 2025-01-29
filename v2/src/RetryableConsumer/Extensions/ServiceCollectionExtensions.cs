@@ -3,6 +3,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using RetryableConsumer.Abstractions.Handlers;
+using RetryableConsumer.Infra.Kafka.Consumers.Extensions;
 using RetryableConsumer.Infra.Kafka.Producers.Extensions;
 using RetryableConsumer.Mapper;
 using RetryableConsumer.Serializers;
@@ -30,6 +31,7 @@ public static class ServiceCollectionExtensions
         var registrationConfig = config.ToRegistrationConfig(registrationId);
 
         services.RegisterProducerServices<TKey, TValue>(registrationConfig);
+        services.RegisterConsumerServices<TKey, TValue>(registrationConfig);
 
         return services;
     }
