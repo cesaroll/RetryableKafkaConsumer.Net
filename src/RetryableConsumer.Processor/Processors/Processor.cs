@@ -39,11 +39,11 @@ public abstract class Processor<TKey, TValue> : IProcessor
     }
 
     public async Task ConsumeAsync(CancellationToken ct)
-    {
-        _logger.LogInformation($"Consuming messages from topic: {_consumer.Topic}");
-        
+    {   
         while (!ct.IsCancellationRequested)
         {
+            _logger.LogInformation($"Consuming messages from topic: {_consumer.RegistrationId}:{_consumer.Topic}");
+            
             try
             {
                 var consumeResult = await _consumer.ConsumeAsync(ct);

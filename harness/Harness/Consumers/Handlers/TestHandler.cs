@@ -14,7 +14,7 @@ public class TestHandler: IValueHandler<TestMessage>
         _logger = logger;
     }
 
-    public Task<Result> HandleAsync(ConsumeResult<Ignore, TestMessage> consumeResult, CancellationToken ct)
+    public async Task<Result> HandleAsync(ConsumeResult<Ignore, TestMessage> consumeResult, CancellationToken ct)
     {
         var value = consumeResult.Message.Value!;
         
@@ -22,15 +22,17 @@ public class TestHandler: IValueHandler<TestMessage>
         
         _logger.LogInformation($"Handling message: {json} in topic: {consumeResult.TopicPartitionOffset.Topic}");
 
+        await Task.Delay(200, ct);
+
         if (value.Value.Contains("retry"))
-            return Task.FromResult<Result>(new RetryResult());
+            return new RetryResult();
         
         if (value.Value.Contains("dlq"))
-            return Task.FromResult<Result>(new DlqResult());
+            return new DlqResult();
         
         if (value.Value.Contains("exception"))
             throw new Exception("A test exception from payload handler");
-        
-        return Task.FromResult<Result>(new SuccessResult());
+
+        return new SuccessResult();
     }
 }

@@ -16,6 +16,8 @@ public static class ServiceCollectionExtensions
             .Get<Config>()!;
 
         services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-1", config);
+        services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-2", config);
+        services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-3", config);
             
         return services;
     }

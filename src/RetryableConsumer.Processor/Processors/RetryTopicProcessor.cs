@@ -60,18 +60,18 @@ public class RetryTopicProcessor<TKey, TValue> : Processor<TKey, TValue>
         }
     }
 
-    private Task DelayAsNeededAsync(Message<TKey, TValue> message, CancellationToken ct)
+    private async Task DelayAsNeededAsync(Message<TKey, TValue> message, CancellationToken ct)
     {
         var currentDateTime = DateTime.UtcNow;
         var shouldRunDateTime = message.Timestamp.UtcDateTime.Add(_consumer.RetryDelay!.Value);
         
         if (shouldRunDateTime <= currentDateTime) 
-            return Task.CompletedTask;
+            return;
         
         var delay = shouldRunDateTime - currentDateTime;
         
         _logger.LogInformation($"Delay handling {_consumer.RegistrationId}:{_consumer.Topic} for {delay.ToString()}");
         
-        return Task.Delay(delay, ct);
+        await Task.Delay(delay, ct);
     }
 }

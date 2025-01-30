@@ -38,10 +38,10 @@ public static class ServiceCollectionExtensions
         services.RegisterConsumerServices<TKey, TValue>(registrationConfig);
         
         services.AddSingleton<IProcessorFactory, ProcessorFactory<TKey, TValue, THandler>>();
-
-        services.AddHostedService(provider => 
+        
+        services.AddSingleton<IHostedService>(prov => 
             ActivatorUtilities.CreateInstance<ConsumerHostedService>(
-                provider, 
+                prov, 
                 registrationConfig));
 
         return services;
