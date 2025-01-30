@@ -87,7 +87,8 @@ public abstract class Processor<TKey, TValue> : IProcessor
         {
             var msg = "An error occurred while handling messages";
             _logger.LogError(ex, msg);
-            return new ErrorResult(msg, ex); // TODO: Try to send to DLQ instead of returning ErrorResult
+
+            return await TryDlq(consumeResult.Message, ct);
         }
     }
 
