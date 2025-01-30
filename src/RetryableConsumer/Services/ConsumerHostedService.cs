@@ -24,11 +24,10 @@ public class ConsumerHostedService : IHostedService
             .CreateProcessors(_config)
             .Select(processor => new ConsumerTask(processor));
         
-        var tasks = consumers.Select(consumer => consumer.Run(ct));
-        
-        await Task.Run(() => Task.WhenAll(tasks), ct);
+        await Parallel.ForEachAsync(consumers, ct, async (consumer, ct) 
+            => await consumer.Run(ct));
     }
-
+    
     public Task StopAsync(CancellationToken ct)
         => Task.CompletedTask;
 }

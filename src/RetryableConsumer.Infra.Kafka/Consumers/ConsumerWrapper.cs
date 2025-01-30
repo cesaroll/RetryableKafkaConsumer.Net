@@ -1,5 +1,4 @@
 using Confluent.Kafka;
-using Microsoft.Extensions.Logging;
 
 namespace RetryableConsumer.Infra.Kafka.Consumers;
 
@@ -28,7 +27,7 @@ public class ConsumerWrapper<TKey, TValue> : IConsumerWrapper<TKey, TValue>
     
     public void Subscribe()
         => _consumer.Subscribe(Topic);
-
+    
     public async Task<ConsumeResult<TKey, TValue>> ConsumeAsync(CancellationToken ct)
         => await Task.Run(() => _consumer.Consume(ct), ct);
     
