@@ -19,18 +19,26 @@ public class ConsumerWrapperFactory<TKey, TValue> : IConsumerWrapperFactory<TKey
     
     public IConsumerWrapper<TKey, TValue> Create(ConsumerWrapperConfig config)
     {
-        var consumer = new ConsumerBuilder<TKey, TValue>(new ConsumerConfig()
+        var builder = new ConsumerBuilder<TKey, TValue>(new ConsumerConfig()
             {
                 BootstrapServers = config.Host,
                 GroupId = config.GroupId,
                 AutoOffsetReset = AutoOffsetReset.Earliest,
                 EnableAutoCommit = false
             })
-            // .SetKeyDeserializer(_keyDeserializer)
-            // .SetValueDeserializer(_valueDeserializer)
-            .Build();
+            .SetValueDeserializer(_valueDeserializer);
+
+        if (_keyDeserializer is not IDeserializer<Ignore>)
+            builder.SetKeyDeserializer(_keyDeserializer);
+            
+        var consumer = builder.Build();
         
         return new ConsumerWrapper<TKey, TValue>(
-            config.RegistrationId, config.Topic, config.RetryDelay, config.RetryAttempts, consumer);
+            config.RegistrationId, 
+            config.Topic, 
+            config.RetryDelay, 
+            config.RetryAttempts, 
+            builder.Build()
+            );
     }
 }

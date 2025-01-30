@@ -22,18 +22,22 @@ public class ProducerWrapperFactory<TKey, TValue> : IProducerWrapperFactory<TKey
 
     public IProducerWrapper<TKey, TValue> Create(ProducerWrapperConfig config)
     {
-        var producer = new ProducerBuilder<TKey, TValue>(new ProducerConfig()
+        var builder = new ProducerBuilder<TKey, TValue>(new ProducerConfig()
             {
                 BootstrapServers = config.Host,
                 MessageSendMaxRetries = 3
             })
             .SetKeySerializer(_keySerializer)
-            .SetValueSerializer(_valueSerializer)
-            .Build();
-
+            .SetValueSerializer(_valueSerializer);
+        
         var logger = _loggerFactory.CreateLogger<ProducerWrapper<TKey, TValue>>();
 
-        return new ProducerWrapper<TKey, TValue>(config.RegistrationId, config.Topic, producer, logger);
+        return new ProducerWrapper<TKey, TValue>(
+            config.RegistrationId, 
+            config.Topic, 
+            builder.Build(), 
+            logger
+            );
     }
 
 }

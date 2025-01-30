@@ -15,7 +15,7 @@ public static class ServiceCollectionExtensions
             .GetRequiredSection("RetryableKafkaConsumer")
             .Get<Config>()!;
 
-        services.RegisterRetryableConsumer<Ignore, string, TestHandler>("Replica-1", config);
+        services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-1", config);
             
         return services;
     }
