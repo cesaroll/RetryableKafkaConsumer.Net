@@ -22,7 +22,7 @@ public class TestHandler: IValueHandler<TestMessage>
         
         _logger.LogInformation($"Handling message: {json} in topic: {consumeResult.TopicPartitionOffset.Topic}");
 
-        await Task.Delay(200, ct);
+        await Task.Delay(50, ct);
 
         if (value.Value.Contains("retry"))
             return new RetryResult();
