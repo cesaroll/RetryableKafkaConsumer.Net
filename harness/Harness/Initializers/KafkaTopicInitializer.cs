@@ -1,12 +1,12 @@
 using Confluent.Kafka;
 using Confluent.Kafka.Admin;
-using Microsoft.Extensions.Hosting;
 
-namespace AppHost.Initializers;
+namespace Harness.Initializers;
 
 public class KafkaTopicInitializer : IHostedService
 {
-    private readonly string _bootstrapServers = "localhost:9092";
+    private readonly string _host;
+    private readonly TaskCompletionSource<bool> _kafkaInitcompletionSource;
     private readonly List<(string, int)> _topicNames =
     [
         ("test-topic", 3),
@@ -14,11 +14,17 @@ public class KafkaTopicInitializer : IHostedService
         ("test-topic-retry2", 1),
         ("test-topic-dlq", 1)
     ];
-    
-    public async Task StartAsync(CancellationToken cancellationToken)
+
+    public KafkaTopicInitializer(string host, TaskCompletionSource<bool> kafkaInitcompletionSource)
+    {
+        _host = host;
+        _kafkaInitcompletionSource = kafkaInitcompletionSource;
+    }
+
+    public async Task StartAsync(CancellationToken ct)
     {
         using var adminClient = new AdminClientBuilder(
-            new AdminClientConfig { BootstrapServers = _bootstrapServers })
+            new AdminClientConfig { BootstrapServers = _host })
             .Build();
 
         try
@@ -34,13 +40,19 @@ public class KafkaTopicInitializer : IHostedService
                         ReplicationFactor = 1
                     }
                 });
-                
+
                 Console.WriteLine($"Kafka topic '{topicName}' created successfully.");
             }
+
+            await Task.Delay(TimeSpan.FromSeconds(5), ct);
         }
         catch (CreateTopicsException ex)
         {
             Console.WriteLine($"Error creating Kafka topic: {ex.Results[0].Error.Reason}");
+        }
+        finally
+        {
+            _kafkaInitcompletionSource.SetResult(true);
         }
     }
 
