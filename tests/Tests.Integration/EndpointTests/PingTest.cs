@@ -1,23 +1,22 @@
-using Aspire.Hosting;
 using Tests.Integration.Tests.Fixtures.App;
 
-namespace Tests.Integration.Tests;
+namespace Tests.Integration.EndpointTests;
 
 [Collection("AppCollection")]
 public class PingTest
 {
-    private readonly AppFixture _appFixture;
+    private readonly HttpClient _httpClient;
 
     public PingTest(AppFixture appFixture)
     {
-        _appFixture = appFixture;
+        _httpClient = appFixture.HttpClient;
     }
     
     [Fact]
     public async Task GetWebResourceRootReturnsOkStatusCode()
     {
         // Act
-        var response = await _appFixture.HttpClient.GetAsync("/ping");
+        var response = await _httpClient.GetAsync("/ping");
 
         // Assert
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

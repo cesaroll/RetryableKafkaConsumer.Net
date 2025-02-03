@@ -28,12 +28,9 @@ public static class ServiceCollectionExtensions
         services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-3", config);
         
         services.TryAddSingleton<ISerializer<TestMessage>>(new JsonSerializer<TestMessage>());
-        
-        services.AddSingleton<IKafkaProducerService<TestMessage>>(prov =>
-                ActivatorUtilities.CreateInstance<KafkaProducerService<TestMessage>>(
-                    prov,
-                    new ProducerServiceConfig(config.Host, config.Topic))
-            );
+
+        services.TryAddSingleton(new ProducerServiceConfig(config.Host, config.Topic));
+        services.TryAddSingleton<IKafkaProducerService<TestMessage>, KafkaProducerService<TestMessage>>();
         
         return services;
     }

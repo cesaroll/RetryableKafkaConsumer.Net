@@ -1,6 +1,7 @@
 using Harness.Extensions;
 using Harness.Models;
 using Harness.Producers;
+using Harness.Producers.Configs;
 using Microsoft.AspNetCore.Mvc;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -22,7 +23,12 @@ app.MapOpenApi();
 
 app.MapGet("/ping", () => "Pong");
 
-app.MapPost("/produce", 
+app.MapGet("kafka/host",
+    (
+        ProducerServiceConfig config) => Results.Ok(new { host = config.Host })
+    );
+
+app.MapPost("/kafka/produce", 
     async (
         [FromServices]
         IKafkaProducerService<TestMessage> producer, 
