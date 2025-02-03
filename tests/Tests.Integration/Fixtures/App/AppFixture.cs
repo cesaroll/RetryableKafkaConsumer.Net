@@ -4,10 +4,10 @@ namespace Tests.Integration.Tests.Fixtures.App;
 
 public class AppFixture : IAsyncLifetime
 {
-    public IDistributedApplicationTestingBuilder AppHost { get; private set; }
-    public DistributedApplication App { get; private set; }
-    public ResourceNotificationService ResourceNotificationService { get; private set; }
-    public HttpClient HttpClient { get; private set; }
+    public IDistributedApplicationTestingBuilder? AppHost { get; private set; }
+    public DistributedApplication? App { get; private set; }
+    public ResourceNotificationService? ResourceNotificationService { get; private set; }
+    public HttpClient? HttpClient { get; private set; }
     
     public async Task InitializeAsync()
     {
