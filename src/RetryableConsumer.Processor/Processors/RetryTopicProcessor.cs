@@ -54,7 +54,7 @@ public class RetryTopicProcessor<TKey, TValue> : Processor<TKey, TValue>
             if (localRetryCount < _consumer.RetryAttempts)
                 return _currentRetryProducer;
             
-            newMessage.SetLocalRetryCountHeader(0);
+            newMessage.SetLocalRetryCountHeader(1);
             
             return _retryProducer;
         }

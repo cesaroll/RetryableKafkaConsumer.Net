@@ -1,7 +1,12 @@
 using Confluent.Kafka;
 using Harness.Consumers.Handlers;
 using Harness.Initializers;
+using Harness.Models;
+using Harness.Producers;
+using Harness.Producers.Configs;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using RetryableConsumer.Extensions;
+using RetryableConsumer.Serializers;
 using Config = RetryableConsumer.Abstractions.Configs.Config;
 
 namespace Harness.Extensions;
@@ -21,7 +26,15 @@ public static class ServiceCollectionExtensions
         services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-1", config);
         services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-2", config);
         services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-3", config);
-            
+        
+        services.TryAddSingleton<ISerializer<TestMessage>>(new JsonSerializer<TestMessage>());
+        
+        services.AddSingleton<IKafkaProducerService<TestMessage>>(prov =>
+                ActivatorUtilities.CreateInstance<KafkaProducerService<TestMessage>>(
+                    prov,
+                    new ProducerServiceConfig(config.Host, config.Topic))
+            );
+        
         return services;
     }
     

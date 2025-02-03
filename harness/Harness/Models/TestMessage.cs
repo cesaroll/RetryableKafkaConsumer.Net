@@ -1,4 +1,4 @@
-namespace Harness.Consumers.Handlers;
+namespace Harness.Models;
 
 public class TestMessage
 {

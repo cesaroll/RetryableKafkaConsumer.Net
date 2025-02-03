@@ -1,5 +1,6 @@
 using System.Text.Json;
 using Confluent.Kafka;
+using Harness.Models;
 using RetryableConsumer.Abstractions.Handlers;
 using RetryableConsumer.Abstractions.Results;
 
