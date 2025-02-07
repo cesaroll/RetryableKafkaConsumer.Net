@@ -1,6 +1,6 @@
 using System.Threading.Channels;
 
-namespace RetryableConsumer.Channels;
+namespace RetryableConsumer.Internals.Channels;
 
 internal interface IChannelWrapper<TKey, TValue>
 {

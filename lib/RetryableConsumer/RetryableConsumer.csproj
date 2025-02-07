@@ -14,8 +14,10 @@
 
     <ItemGroup>
       <ProjectReference Include="..\RetryableConsumer.Abstractions\RetryableConsumer.Abstractions.csproj" />
-      <ProjectReference Include="..\RetryableConsumer.Channels\RetryableConsumer.Channels.csproj" />
-      <ProjectReference Include="..\RetryableConsumer.Domain\RetryableConsumer.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Folder Include="Internals\Registration\Configs\" />
     </ItemGroup>
 
 </Project>

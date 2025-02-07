@@ -1,9 +1,9 @@
 using RetryableConsumer.Abstractions.Configs;
-using RetryableConsumer.Domain.Configs;
-using DlqConfig = RetryableConsumer.Domain.Configs.DlqConfig;
-using RetryConfig = RetryableConsumer.Domain.Configs.RetryConfig;
+using RetryableConsumer.Internals.Configs;
+using DlqConfig = RetryableConsumer.Internals.Configs.DlqConfig;
+using RetryConfig = RetryableConsumer.Internals.Configs.RetryConfig;
 
-namespace RetryableConsumer.Mapper;
+namespace RetryableConsumer.Internals.Registration.Mappers;
 
 internal static class RegistrationConfigsMapper
 {

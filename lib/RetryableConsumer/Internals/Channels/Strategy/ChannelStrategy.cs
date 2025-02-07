@@ -1,4 +1,4 @@
-namespace RetryableConsumer.Channels;
+namespace RetryableConsumer.Internals.Channels.Strategy;
 
 internal class ChannelStrategy<TKey, TValue> : IChannelStrategy<TKey, TValue>
 {

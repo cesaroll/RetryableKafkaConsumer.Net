@@ -3,8 +3,8 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Hosting;
 using RetryableConsumer.Abstractions.Handlers;
-using RetryableConsumer.Channels.Extensions;
-using RetryableConsumer.Mapper;
+using RetryableConsumer.Internals.Channels.Extensions;
+using RetryableConsumer.Internals.Registration.Mappers;
 using RetryableConsumer.Serializers;
 using Config = RetryableConsumer.Abstractions.Configs.Config;
 

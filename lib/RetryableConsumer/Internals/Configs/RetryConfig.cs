@@ -1,6 +1,6 @@
-namespace RetryableConsumer.Domain.Configs;
+namespace RetryableConsumer.Internals.Configs;
 
-public class RetryConfig
+internal class RetryConfig
 {
     public required string Topic { get; set; }
     public required string Host { get; set; }

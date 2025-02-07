@@ -1,19 +1,30 @@
 using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using RetryableConsumer.Domain.Configs;
+using RetryableConsumer.Internals.Channels.Strategy;
+using RetryableConsumer.Internals.Configs;
 
-namespace RetryableConsumer.Channels.Extensions;
+namespace RetryableConsumer.Internals.Channels.Extensions;
 
-public static class ServiceColectionExtensions
+internal static class ServiceColectionExtensions
 {
     public static IServiceCollection RegisterChannels<TKey, TValue>(
         this IServiceCollection services, RegistrationConfig config)
     {
         var channelCapacity = config.ProcessorCount * 2;
         
-        // Setup Main Channel
-        services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
+        services.RegisterMainChannel<TKey, TValue>(channelCapacity);
+        services.RegisterCommitChannel<TKey, TValue>(channelCapacity);
+        services.RegistryRetryChannels<TKey, TValue>(config, channelCapacity);
+        services.RegisterDlqChannel<TKey, TValue>(channelCapacity);
+
+        services.TryAddSingleton<IChannelStrategy<TKey, TValue>, ChannelStrategy<TKey, TValue>>();
+        
+        return services;
+    }
+
+    private static void RegisterMainChannel<TKey, TValue>(this IServiceCollection services, int channelCapacity)
+        => services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
             new ChannelWrapper<TKey, TValue>(
                 id: ChannelType.Main.ToString(), 
                 channelType: ChannelType.Main,
@@ -25,11 +36,11 @@ public static class ServiceColectionExtensions
                         FullMode = BoundedChannelFullMode.Wait,
                         AllowSynchronousContinuations = false
                     })
-                )
-            );
-        
-        // Setup Commit Channel
-        services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
+            )
+        );
+    
+    private static void RegisterCommitChannel<TKey, TValue>(this IServiceCollection services, int channelCapacity)
+        => services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
             new ChannelWrapper<TKey, TValue>(
                 id: ChannelType.Commit.ToString(), 
                 channelType: ChannelType.Commit,
@@ -43,10 +54,12 @@ public static class ServiceColectionExtensions
                     })
             )
         );
-        
-        // Setup Retry Channels (if any)
-        foreach (var retry in config.Retries)
-        {
+
+    private static void RegistryRetryChannels<TKey, TValue>(
+        this IServiceCollection services,
+        RegistrationConfig config,
+        int channelCapacity)
+        => config.Retries.ForEach(retry => 
             services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
                 new ChannelWrapper<TKey, TValue>(
                     id: retry.Topic, 
@@ -60,11 +73,11 @@ public static class ServiceColectionExtensions
                             AllowSynchronousContinuations = false
                         })
                 )
-            );
-        }
-        
-        // Setup Dlq Channel
-        services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
+            )
+        );
+    
+    private static void RegisterDlqChannel<TKey, TValue>(this IServiceCollection services, int channelCapacity)
+        => services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
             new ChannelWrapper<TKey, TValue>(
                 id: ChannelType.Dlq.ToString(), 
                 channelType: ChannelType.Dlq,
@@ -78,9 +91,4 @@ public static class ServiceColectionExtensions
                     })
             )
         );
-        
-        services.TryAddSingleton<IChannelStrategy<TKey, TValue>, ChannelStrategy<TKey, TValue>>();
-        
-        return services;
-    }
 }

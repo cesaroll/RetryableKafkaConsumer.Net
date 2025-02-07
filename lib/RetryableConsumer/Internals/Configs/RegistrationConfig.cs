@@ -1,6 +1,6 @@
-namespace RetryableConsumer.Domain.Configs;
+namespace RetryableConsumer.Internals.Configs;
 
-public class RegistrationConfig
+internal class RegistrationConfig
 {
     public required MainConfig Main { get; init; }
     public required int ProcessorCount { get; init; }

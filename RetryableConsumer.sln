@@ -32,10 +32,6 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryableConsumer", "lib\Re
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryableConsumer.Abstractions", "lib\RetryableConsumer.Abstractions\RetryableConsumer.Abstractions.csproj", "{2E8D95EB-B99C-4FBC-94A6-5BD4314C0A3B}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryableConsumer.Domain", "lib\RetryableConsumer.Domain\RetryableConsumer.Domain.csproj", "{436A6B67-67C1-444A-88B2-AD7F81FBF2FC}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RetryableConsumer.Channels", "lib\RetryableConsumer.Channels\RetryableConsumer.Channels.csproj", "{70A239EA-7357-4E69-9B04-B97CDB295B02}"
-EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -53,8 +49,6 @@ Global
 		{3EF63CF0-B391-44AD-A65C-3159DE80688E} = {FD34547D-B7FE-4320-862B-7B14A9D8D2E9}
 		{7B8E7D8E-437C-456B-B5B7-E9CD45CA3869} = {4974FC50-B0AC-4856-A8CA-4DAB21DD6773}
 		{2E8D95EB-B99C-4FBC-94A6-5BD4314C0A3B} = {4974FC50-B0AC-4856-A8CA-4DAB21DD6773}
-		{436A6B67-67C1-444A-88B2-AD7F81FBF2FC} = {4974FC50-B0AC-4856-A8CA-4DAB21DD6773}
-		{70A239EA-7357-4E69-9B04-B97CDB295B02} = {4974FC50-B0AC-4856-A8CA-4DAB21DD6773}
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
 		{C996648A-54E8-4592-A7E9-AD6CE2A1D99C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
@@ -101,13 +95,5 @@ Global
 		{2E8D95EB-B99C-4FBC-94A6-5BD4314C0A3B}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2E8D95EB-B99C-4FBC-94A6-5BD4314C0A3B}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2E8D95EB-B99C-4FBC-94A6-5BD4314C0A3B}.Release|Any CPU.Build.0 = Release|Any CPU
-		{436A6B67-67C1-444A-88B2-AD7F81FBF2FC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{436A6B67-67C1-444A-88B2-AD7F81FBF2FC}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{436A6B67-67C1-444A-88B2-AD7F81FBF2FC}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{436A6B67-67C1-444A-88B2-AD7F81FBF2FC}.Release|Any CPU.Build.0 = Release|Any CPU
-		{70A239EA-7357-4E69-9B04-B97CDB295B02}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{70A239EA-7357-4E69-9B04-B97CDB295B02}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{70A239EA-7357-4E69-9B04-B97CDB295B02}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{70A239EA-7357-4E69-9B04-B97CDB295B02}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

@@ -1,6 +1,6 @@
-namespace RetryableConsumer.Domain.Configs;
+namespace RetryableConsumer.Internals.Configs;
 
-public class DlqConfig
+internal class DlqConfig
 {
     public required string Topic { get; init; }
     public required string Host { get; init; }
