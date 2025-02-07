@@ -7,7 +7,12 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <ProjectReference Include="..\RetryableConsumer.Domain\RetryableConsumer.Domain.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
       <PackageReference Include="Confluent.Kafka" Version="2.8.0" />
+      <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="9.0.1" />
     </ItemGroup>
 
 </Project>
