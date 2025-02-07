@@ -26,7 +26,7 @@ public static class ServiceCollectionExtensions
         services.AddSerializers<TKey, TValue>();
 
         var registrationConfig = config.ToRegistrationConfig();
-
+        
         services.RegisterChannels<TKey, TValue>(registrationConfig);
         
         return services;

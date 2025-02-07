@@ -79,6 +79,8 @@ public static class ServiceColectionExtensions
             )
         );
         
+        services.TryAddSingleton<IChannelStrategy<TKey, TValue>, ChannelStrategy<TKey, TValue>>();
+        
         return services;
     }
 }
