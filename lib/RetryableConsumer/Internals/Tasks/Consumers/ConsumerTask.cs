@@ -3,12 +3,12 @@ using System.Threading.Channels;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using RetryableConsumer.Internals.Channels;
+using RetryableConsumer.Internals.Channels.Extensions;
 
 namespace RetryableConsumer.Internals.Tasks.Consumers;
 
 internal class ConsumerTask<TKey, TValue> : ITask
 {
-    private static readonly TimeSpan TimeoutDuration = TimeSpan.FromSeconds(3);
     private readonly string _topic;
     private readonly IConsumer<TKey, TValue> _consumer;
     private readonly ChannelWriter<ChannelRequest<TKey, TValue>> _outChannelWriter;
@@ -80,10 +80,12 @@ internal class ConsumerTask<TKey, TValue> : ITask
             try
             {
                 var request = await _inCommitChannelReader.ReadAsync(ct);
+                var consumeResult = request.ConsumeResult;
+                
                 _logger.LogDebug(
                     $"Committing message topic: {_topic}. " +
-                    $"Message: {JsonSerializer.Serialize(request.ConsumeResult.Message.Value)}");
-                var consumeResult = request.ConsumeResult;
+                    $"Message: {JsonSerializer.Serialize(consumeResult.Message.Value)}");
+                
                 _consumer.Commit(consumeResult);
             }
             catch (Exception ex)
@@ -100,15 +102,12 @@ internal class ConsumerTask<TKey, TValue> : ITask
         ConsumeResult<TKey, TValue> consumeResult,
         CancellationToken ct)
     {
-        using var cts = new CancellationTokenSource(TimeoutDuration);
-        using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct);
-        
         try
         {
-            await _outChannelWriter.WriteAsync(new ChannelRequest<TKey, TValue>(consumeResult), linkedCts.Token);
+            await _outChannelWriter.WriteWithTimeOutAsync(new ChannelRequest<TKey, TValue>(consumeResult), ct);
         } catch (OperationCanceledException ex)
         {
-            var msg = $"Writing to main channel timed out after {TimeoutDuration.TotalSeconds} seconds.";
+            var msg = $"Writing to main channel timed out.";
             throw new TimeoutException(msg, ex);
         }
     }

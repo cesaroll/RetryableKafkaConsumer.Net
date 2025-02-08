@@ -1,4 +1,3 @@
-using System.Text;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using RetryableConsumer.Abstractions.Handlers;

@@ -30,7 +30,7 @@ public static class ServiceCollectionExtensions
         var registrationConfig = config.ToRegistrationConfig();
         
         services.RegisterChannels<TKey, TValue>(registrationConfig);
-        services.RegisterTasks<TKey, TValue>(registrationConfig);
+        services.RegisterTasks<TKey, TValue, THandler>(registrationConfig);
 
         services.AddHostedService<ConsumerHostedService>();
         

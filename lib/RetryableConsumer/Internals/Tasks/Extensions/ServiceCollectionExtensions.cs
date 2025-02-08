@@ -1,16 +1,19 @@
 using Confluent.Kafka;
 using Microsoft.Extensions.DependencyInjection;
+using RetryableConsumer.Abstractions.Handlers;
 using RetryableConsumer.Internals.Channels.Strategy;
 using RetryableConsumer.Internals.Registration.Configs;
-using RetryableConsumer.Internals.Tasks.Consumers;
+using RetryableConsumer.Internals.Tasks.Consumers.Extensions;
+using RetryableConsumer.Internals.Tasks.Processors.Extensions;
 
 namespace RetryableConsumer.Internals.Tasks.Extensions;
 
 internal static class ServiceCollectionExtensions
 {
-    public static IServiceCollection RegisterTasks<TKey, TValue>(
+    public static IServiceCollection RegisterTasks<TKey, TValue, THandler>(
         this IServiceCollection services, 
         RegistrationConfig config)
+        where THandler : IHandler<TKey, TValue>
     {
         var serviceProvider = services.BuildServiceProvider();
         var channelStrategy = serviceProvider.GetRequiredService<IChannelStrategy<TKey, TValue>>();
@@ -18,50 +21,11 @@ internal static class ServiceCollectionExtensions
         var valueDeserializer = serviceProvider.GetRequiredService<IDeserializer<TValue>>();
         
         services.RegisterMainConsumerTask(config.Main, channelStrategy, keyDeserializer, valueDeserializer);
+        services.RegisterMainProcessorTasks<TKey, TValue, THandler>(
+            serviceProvider, 
+            config, 
+            channelStrategy);
         
         return services;
-    }
-    
-    private static void RegisterMainConsumerTask<TKey, TValue>(
-        this IServiceCollection services,
-        MainConfig config,
-        IChannelStrategy<TKey, TValue> channelStrategy,
-        IDeserializer<TKey> keyDeserializer,
-        IDeserializer<TValue> valueDeserializer)
-    {
-        var topic = config.Topic;
-        var mainChannelWriter = channelStrategy.GetMainChannel().Channel.Writer;
-        var commitChannelReader = channelStrategy.GetCommitChannel().Channel.Reader;
-        var consumer = CreateConsumer(config.Host, config.GroupId, keyDeserializer, valueDeserializer);
-
-        services.AddSingleton<ITask>(prov =>
-            ActivatorUtilities.CreateInstance<ConsumerTask<TKey, TValue>>(
-                prov,
-                topic,
-                consumer,
-                mainChannelWriter,
-                commitChannelReader)
-            );
-    }
-    
-    private static IConsumer<TKey, TValue> CreateConsumer<TKey, TValue>(
-        string host,
-        string groupId,
-        IDeserializer<TKey> keyDeserializer,
-        IDeserializer<TValue> valueDeserializer)
-    {
-        var consumerBuilder = new ConsumerBuilder<TKey, TValue>(new ConsumerConfig()
-            {
-                BootstrapServers = host,
-                GroupId = groupId,
-                AutoOffsetReset = AutoOffsetReset.Earliest,
-                EnableAutoCommit = false
-            })
-            .SetValueDeserializer(valueDeserializer);
-        
-        if (keyDeserializer is not IDeserializer<Ignore>)
-            consumerBuilder.SetKeyDeserializer(keyDeserializer);
-        
-        return consumerBuilder.Build();
     }
 }

@@ -26,14 +26,14 @@ public class TestHandler: IValueHandler<TestMessage>
         await Task.Delay(50, ct);
 
         if (value.Value.Contains("retry"))
-            return new RetryResult();
-        
+            return RetryResult.Instance;
+
         if (value.Value.Contains("dlq"))
-            return new DlqResult();
+            return DlqResult.Instance;
         
         if (value.Value.Contains("exception"))
             throw new Exception("A test exception from payload handler");
 
-        return new SuccessResult();
+        return SuccessResult.Instance;
     }
 }
