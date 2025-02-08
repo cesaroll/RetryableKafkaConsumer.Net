@@ -17,7 +17,7 @@ internal static class RegistrationConfigsMapper
                 Host = configurations.Host,
                 GroupId = configurations.GroupId
             },
-            ProcessorCount = configurations.ProcessorCount
+            ConcurrencyDegree = configurations.ConcurrencyDegree
         };
 
         foreach (var retry in configurations.Retries)

@@ -23,9 +23,14 @@ public static class ServiceCollectionExtensions
 
         config = services.SetupAspire(configManager, config);
         
-        services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-1", config);
-        services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-2", config);
-        services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-3", config);
+        // Retryable Consumer Lib v1
+        // services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-1", config);
+        // services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-2", config);
+        // services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>("Replica-3", config);
+        
+        // Retryable Consumer Lib v2
+        services.RegisterRetryableConsumer<Ignore, TestMessage, TestHandler>(config);
+        
         
         services.TryAddSingleton<ISerializer<TestMessage>>(new JsonSerializer<TestMessage>());
 

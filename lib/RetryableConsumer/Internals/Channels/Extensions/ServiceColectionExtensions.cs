@@ -11,7 +11,7 @@ internal static class ServiceColectionExtensions
     public static IServiceCollection RegisterChannels<TKey, TValue>(
         this IServiceCollection services, RegistrationConfig config)
     {
-        var channelCapacity = config.ProcessorCount * 2;
+        var channelCapacity = config.ConcurrencyDegree * 2;
         
         services.RegisterMainChannel<TKey, TValue>(channelCapacity);
         services.RegisterCommitChannel<TKey, TValue>(channelCapacity);
