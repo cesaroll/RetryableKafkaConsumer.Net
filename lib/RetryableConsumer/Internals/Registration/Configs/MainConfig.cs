@@ -1,4 +1,4 @@
-namespace RetryableConsumer.Internals.Configs;
+namespace RetryableConsumer.Internals.Registration.Configs;
 
 internal class MainConfig
 {

@@ -5,6 +5,8 @@ using Microsoft.Extensions.Hosting;
 using RetryableConsumer.Abstractions.Handlers;
 using RetryableConsumer.Internals.Channels.Extensions;
 using RetryableConsumer.Internals.Registration.Mappers;
+using RetryableConsumer.Internals.Services;
+using RetryableConsumer.Internals.Tasks.Extensions;
 using RetryableConsumer.Serializers;
 using Config = RetryableConsumer.Abstractions.Configs.Config;
 
@@ -28,6 +30,9 @@ public static class ServiceCollectionExtensions
         var registrationConfig = config.ToRegistrationConfig();
         
         services.RegisterChannels<TKey, TValue>(registrationConfig);
+        services.RegisterTasks<TKey, TValue>(registrationConfig);
+
+        services.AddHostedService<ConsumerHostedService>();
         
         return services;
     }

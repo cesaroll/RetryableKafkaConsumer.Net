@@ -1,7 +1,7 @@
 using RetryableConsumer.Abstractions.Configs;
-using RetryableConsumer.Internals.Configs;
-using DlqConfig = RetryableConsumer.Internals.Configs.DlqConfig;
-using RetryConfig = RetryableConsumer.Internals.Configs.RetryConfig;
+using RetryableConsumer.Internals.Registration.Configs;
+using DlqConfig = RetryableConsumer.Internals.Registration.Configs.DlqConfig;
+using RetryConfig = RetryableConsumer.Internals.Registration.Configs.RetryConfig;
 
 namespace RetryableConsumer.Internals.Registration.Mappers;
 

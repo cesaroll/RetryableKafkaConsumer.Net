@@ -2,7 +2,7 @@ using System.Threading.Channels;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using RetryableConsumer.Internals.Channels.Strategy;
-using RetryableConsumer.Internals.Configs;
+using RetryableConsumer.Internals.Registration.Configs;
 
 namespace RetryableConsumer.Internals.Channels.Extensions;
 
