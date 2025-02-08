@@ -15,9 +15,10 @@ internal static class RegistrationConfigsMapper
             {
                 Topic = configurations.Topic,
                 Host = configurations.Host,
-                GroupId = configurations.GroupId
-            },
-            ConcurrencyDegree = configurations.ConcurrencyDegree
+                GroupId = configurations.GroupId,
+                ConcurrencyDegree = configurations.ConcurrencyDegree,
+                ChannelCapacity = configurations.ChannelCapacity
+            }
         };
 
         foreach (var retry in configurations.Retries)
@@ -29,7 +30,9 @@ internal static class RegistrationConfigsMapper
                 GroupId = retry.GroupId?? configurations.GroupId + "_retry",
                 Delay = retry.Delay,
                 Attempts = retry.Attempts,
-                InfraRetries = configurations.InfraRetries
+                InfraRetries = configurations.InfraRetries,
+                ConcurrencyDegree = retry.ConcurrencyDegree,
+                ChannelCapacity = retry.ChannelCapacity
             });
         }
         
@@ -39,7 +42,9 @@ internal static class RegistrationConfigsMapper
             {
                 Topic = configurations.Dlq.Topic,
                 Host = configurations.Dlq.Host?? configurations.Host,
-                InfraRetries = configurations.InfraRetries
+                InfraRetries = configurations.InfraRetries,
+                ConcurrencyDegree = configurations.Dlq.ConcurrencyDegree,
+                ChannelCapacity = configurations.Dlq.ChannelCapacity
             };
         }
         

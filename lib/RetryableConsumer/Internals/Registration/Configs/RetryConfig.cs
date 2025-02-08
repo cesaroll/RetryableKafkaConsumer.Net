@@ -8,4 +8,6 @@ internal class RetryConfig
     public required TimeSpan Delay { get; set; }
     public required int Attempts { get; set; }
     public required int InfraRetries { get; set; }
+    public required int ConcurrencyDegree { get; init; }
+    public required int ChannelCapacity { get; init; }
 }

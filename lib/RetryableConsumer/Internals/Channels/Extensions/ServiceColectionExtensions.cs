@@ -11,12 +11,12 @@ internal static class ServiceColectionExtensions
     public static IServiceCollection RegisterChannels<TKey, TValue>(
         this IServiceCollection services, RegistrationConfig config)
     {
-        var channelCapacity = config.ConcurrencyDegree * 2;
+        // var channelCapacity = config.ChannelCapacity;
         
-        services.RegisterMainChannel<TKey, TValue>(channelCapacity);
-        services.RegisterCommitChannel<TKey, TValue>(channelCapacity);
-        services.RegistryRetryChannels<TKey, TValue>(config, channelCapacity);
-        services.RegisterDlqChannel<TKey, TValue>(channelCapacity);
+        services.RegisterMainChannel<TKey, TValue>(config.Main.ChannelCapacity);
+        services.RegisterCommitChannel<TKey, TValue>(config.Main.ChannelCapacity);
+        services.RegistryRetryChannels<TKey, TValue>(config);
+        services.RegisterDlqChannel<TKey, TValue>(config.Dlq?.ChannelCapacity ?? 1);
 
         services.TryAddSingleton<IChannelStrategy<TKey, TValue>, ChannelStrategy<TKey, TValue>>();
         
@@ -57,15 +57,14 @@ internal static class ServiceColectionExtensions
 
     private static void RegistryRetryChannels<TKey, TValue>(
         this IServiceCollection services,
-        RegistrationConfig config,
-        int channelCapacity)
+        RegistrationConfig config)
         => config.Retries.ForEach(retry => 
             services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
                 new ChannelWrapper<TKey, TValue>(
                     id: retry.Topic, 
                     channelType: ChannelType.Retry,
                     channel: Channel.CreateBounded<ChannelRequest<TKey, TValue>>(
-                        new BoundedChannelOptions(channelCapacity)
+                        new BoundedChannelOptions(retry.ChannelCapacity)
                         {
                             SingleWriter = false,
                             SingleReader = true,

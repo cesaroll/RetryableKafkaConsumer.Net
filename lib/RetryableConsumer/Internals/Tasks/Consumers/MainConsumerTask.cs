@@ -59,8 +59,6 @@ internal class MainConsumerTask<TKey, TValue> : ITask
                     $"Consumed message from topic: {_topic}. " +
                     $"Message: {JsonSerializer.Serialize(consumeResult.Message.Value)}");
                 
-                
-                
                 await WriteToMainChannelAsync(consumeResult, ct);
             }
             catch (Exception ex)
