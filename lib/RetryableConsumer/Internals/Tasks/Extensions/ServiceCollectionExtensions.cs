@@ -17,8 +17,7 @@ internal static class ServiceCollectionExtensions
         var keyDeserializer = serviceProvider.GetRequiredService<IDeserializer<TKey>>();
         var valueDeserializer = serviceProvider.GetRequiredService<IDeserializer<TValue>>();
         
-        services.RegisterMainConsumerTask(
-            config.Main, channelStrategy, keyDeserializer, valueDeserializer);
+        services.RegisterMainConsumerTask(config.Main, channelStrategy, keyDeserializer, valueDeserializer);
         
         return services;
     }
@@ -36,7 +35,7 @@ internal static class ServiceCollectionExtensions
         var consumer = CreateConsumer(config.Host, config.GroupId, keyDeserializer, valueDeserializer);
 
         services.AddSingleton<ITask>(prov =>
-            ActivatorUtilities.CreateInstance<MainConsumerTask<TKey, TValue>>(
+            ActivatorUtilities.CreateInstance<ConsumerTask<TKey, TValue>>(
                 prov,
                 topic,
                 consumer,

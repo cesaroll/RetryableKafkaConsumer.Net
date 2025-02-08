@@ -6,29 +6,29 @@ using RetryableConsumer.Internals.Channels;
 
 namespace RetryableConsumer.Internals.Tasks.Consumers;
 
-internal class MainConsumerTask<TKey, TValue> : ITask
+internal class ConsumerTask<TKey, TValue> : ITask
 {
     private static readonly TimeSpan TimeoutDuration = TimeSpan.FromSeconds(3);
     private readonly string _topic;
     private readonly IConsumer<TKey, TValue> _consumer;
-    private readonly ChannelWriter<ChannelRequest<TKey, TValue>> _mainChannelWriter;
-    private readonly ChannelReader<ChannelRequest<TKey, TValue>> _commitChannelReader;
-    private readonly ILogger<MainConsumerTask<TKey, TValue>> _logger;
-
-    public MainConsumerTask(
+    private readonly ChannelWriter<ChannelRequest<TKey, TValue>> _outChannelWriter;
+    private readonly ChannelReader<ChannelRequest<TKey, TValue>> _inCommitChannelReader;
+    private readonly ILogger<ConsumerTask<TKey, TValue>> _logger;
+    
+    public ConsumerTask(
         string topic,
         IConsumer<TKey, TValue> consumer,
-        ChannelWriter<ChannelRequest<TKey, TValue>> mainChannelWriter,
-        ChannelReader<ChannelRequest<TKey, TValue>> commitChannelReader,
-        ILogger<MainConsumerTask<TKey, TValue>> logger)
+        ChannelWriter<ChannelRequest<TKey, TValue>> outChannelWriter,
+        ChannelReader<ChannelRequest<TKey, TValue>> inCommitChannelReader,
+        ILogger<ConsumerTask<TKey, TValue>> logger)
     {
         _topic = topic;
         _consumer = consumer;
-        _mainChannelWriter = mainChannelWriter;
-        _commitChannelReader = commitChannelReader;
+        _outChannelWriter = outChannelWriter;
+        _inCommitChannelReader = inCommitChannelReader;
         _logger = logger;
     }
-
+    
     public async Task Run(CancellationToken ct)
     {
         ConsumerSubscribe();
@@ -38,14 +38,14 @@ internal class MainConsumerTask<TKey, TValue> : ITask
         
         await Task.WhenAll(consumerTask, commitTask);
     }
-
+    
     private void ConsumerSubscribe()
     {
         _logger.LogInformation($"Subscribing to topic: {_topic}");
         _consumer.Subscribe(_topic);
         _logger.LogInformation($"Subscribed to topic: {_topic}");
     }
-
+    
     private async Task ConsumerRunAsync(CancellationToken ct)
     {
         _logger.LogInformation($"Consuming messages from topic: {_topic}");
@@ -59,7 +59,7 @@ internal class MainConsumerTask<TKey, TValue> : ITask
                     $"Consumed message from topic: {_topic}. " +
                     $"Message: {JsonSerializer.Serialize(consumeResult.Message.Value)}");
                 
-                await WriteToMainChannelAsync(consumeResult, ct);
+                await WriteToOutChannelAsync(consumeResult, ct);
             }
             catch (Exception ex)
             {
@@ -79,7 +79,7 @@ internal class MainConsumerTask<TKey, TValue> : ITask
         {
             try
             {
-                var request = await _commitChannelReader.ReadAsync(ct);
+                var request = await _inCommitChannelReader.ReadAsync(ct);
                 _logger.LogDebug(
                     $"Committing message topic: {_topic}. " +
                     $"Message: {JsonSerializer.Serialize(request.ConsumeResult.Message.Value)}");
@@ -95,17 +95,17 @@ internal class MainConsumerTask<TKey, TValue> : ITask
     
     private async Task<ConsumeResult<TKey, TValue>> ConsumeAsync(CancellationToken ct)
         => await Task.Run(() => _consumer.Consume(ct), ct);
-
-    private async Task WriteToMainChannelAsync(
-            ConsumeResult<TKey, TValue> consumeResult,
-            CancellationToken ct)
+    
+    private async Task WriteToOutChannelAsync(
+        ConsumeResult<TKey, TValue> consumeResult,
+        CancellationToken ct)
     {
         using var cts = new CancellationTokenSource(TimeoutDuration);
         using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(cts.Token, ct);
         
         try
         {
-            await _mainChannelWriter.WriteAsync(new ChannelRequest<TKey, TValue>(consumeResult), linkedCts.Token);
+            await _outChannelWriter.WriteAsync(new ChannelRequest<TKey, TValue>(consumeResult), linkedCts.Token);
         } catch (OperationCanceledException ex)
         {
             var msg = $"Writing to main channel timed out after {TimeoutDuration.TotalSeconds} seconds.";
