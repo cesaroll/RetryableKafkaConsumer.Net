@@ -1,5 +1,4 @@
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using RetryableConsumer.Abstractions.Handlers;
 using RetryableConsumer.Internals.Channels.Strategy;
 using RetryableConsumer.Internals.Registration.Configs;

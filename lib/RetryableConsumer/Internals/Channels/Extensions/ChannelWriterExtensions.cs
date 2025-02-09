@@ -1,5 +1,4 @@
 using System.Threading.Channels;
-using Confluent.Kafka;
 
 namespace RetryableConsumer.Internals.Channels.Extensions;
 

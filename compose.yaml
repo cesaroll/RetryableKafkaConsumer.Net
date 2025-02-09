@@ -1,6 +1,27 @@
-version: '3.8'
-
 services:
+  service:
+    image: ces/harness:latest
+    container_name: harness
+    hostname: harness
+    build:
+      context: .
+      dockerfile: "./docker/Dockerfile"
+    ports:
+      - "8080:8080"
+    environment:
+      ASPNETCORE_ENVIRONMENT: Docker
+    deploy:
+      resources:
+        limits:
+          cpus: "2.0"
+          memory: "1G"
+        reservations:
+          cpus: "1.0"  
+          memory: "512M"
+    depends_on:
+      kafka-init:
+        condition: service_completed_successfully
+
   kafka-kraft:
     image: confluentinc/cp-kafka:7.8.0
     container_name: kafka-kraft
@@ -49,7 +70,7 @@ services:
     container_name: kafka-ui
     hostname: kafka-ui
     ports:
-      - "8080:8080" # Kafka UI port
+      - "8081:8080" # Kafka UI port
     environment:
       KAFKA_CLUSTERS_0_NAME: local
       KAFKA_CLUSTERS_0_BOOTSTRAPSERVERS: kafka-kraft:29092
