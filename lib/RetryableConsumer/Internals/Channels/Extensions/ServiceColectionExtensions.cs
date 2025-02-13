@@ -11,11 +11,9 @@ internal static class ServiceColectionExtensions
     public static IServiceCollection RegisterChannels<TKey, TValue>(
         this IServiceCollection services, RegistrationConfig config)
     {
-        // var channelCapacity = config.ChannelCapacity;
-        
         services.RegisterMainChannel<TKey, TValue>(config.Main.ChannelCapacity);
         services.RegisterCommitChannel<TKey, TValue>(config.Main.ChannelCapacity);
-        services.RegistryRetryChannels<TKey, TValue>(config);
+        services.RegistryRetryChannels<TKey, TValue>(config.Retries);
         services.RegisterDlqChannel<TKey, TValue>(config.Dlq?.ChannelCapacity ?? 1);
 
         services.TryAddSingleton<IChannelStrategy<TKey, TValue>, ChannelStrategy<TKey, TValue>>();
@@ -57,8 +55,8 @@ internal static class ServiceColectionExtensions
 
     private static void RegistryRetryChannels<TKey, TValue>(
         this IServiceCollection services,
-        RegistrationConfig config)
-        => config.Retries.ForEach(retry => 
+        List<RetryConfig> retryConfigs)
+        => retryConfigs.ForEach(retry => 
             services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
                 new ChannelWrapper<TKey, TValue>(
                     id: retry.Topic, 

@@ -5,6 +5,7 @@ using RetryableConsumer.Internals.Channels.Strategy;
 using RetryableConsumer.Internals.Registration.Configs;
 using RetryableConsumer.Internals.Tasks.Consumers.Extensions;
 using RetryableConsumer.Internals.Tasks.Processors.Extensions;
+using RetryableConsumer.Internals.Tasks.Producers.Extensions;
 
 namespace RetryableConsumer.Internals.Tasks.Extensions;
 
@@ -20,11 +21,15 @@ internal static class ServiceCollectionExtensions
         var keyDeserializer = serviceProvider.GetRequiredService<IDeserializer<TKey>>();
         var valueDeserializer = serviceProvider.GetRequiredService<IDeserializer<TValue>>();
         
-        services.RegisterMainConsumerTask(config.Main, channelStrategy, keyDeserializer, valueDeserializer);
-        services.RegisterMainProcessorTasks<TKey, TValue, THandler>(
+        services.RegisterConsumerTasks(config, channelStrategy, keyDeserializer, valueDeserializer);
+        
+        services.RegisterProcessorTasks<TKey, TValue, THandler>(
             serviceProvider, 
             config, 
             channelStrategy);
+        
+        services.RegisterProducerTasks(serviceProvider, config, channelStrategy);
+        
         
         return services;
     }

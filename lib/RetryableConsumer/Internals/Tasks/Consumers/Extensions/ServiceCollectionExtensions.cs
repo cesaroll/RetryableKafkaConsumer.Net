@@ -7,7 +7,23 @@ namespace RetryableConsumer.Internals.Tasks.Consumers.Extensions;
 
 internal static class ServiceCollectionExtensions
 {
-    internal static void RegisterMainConsumerTask<TKey, TValue>(
+    internal static IServiceCollection RegisterConsumerTasks<TKey, TValue>(
+        this IServiceCollection services,
+        RegistrationConfig config,
+        IChannelStrategy<TKey, TValue> channelStrategy,
+        IDeserializer<TKey> keyDeserializer,
+        IDeserializer<TValue> valueDeserializer)
+    {
+        services.RegisterMainConsumerTask(
+            config.Main,
+            channelStrategy,
+            keyDeserializer,
+            valueDeserializer);
+
+        return services;
+    }
+    
+    private static void RegisterMainConsumerTask<TKey, TValue>(
         this IServiceCollection services,
         MainConfig config,
         IChannelStrategy<TKey, TValue> channelStrategy,

@@ -55,7 +55,7 @@ internal abstract class BaseProcessorTask<TKey, TValue> : ITask
                 
                 var result = await TryHandleAsync(channelRequest, ct);
                 
-                if (result is not ErrorResult)
+                if (result is not ErrorResult) // TODO: Else, if error result then log error and send to a counter since it would require re-processing/rebalance
                 {
                     await WriteToOutCommitChannelAsync(channelRequest, ct);
                 }

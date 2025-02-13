@@ -35,8 +35,8 @@ internal class ConsumerTask<TKey, TValue> : ITask
     {
         ConsumerSubscribe();
         
-        var consumerTask = ConsumerRunAsync(ct);
-        var commitTask = CommitRunAsync(ct);
+        var consumerTask = ConsumeAsync(ct);
+        var commitTask = CommitAsync(ct);
 
         await Task.Run(() => Task.WhenAll(consumerTask, commitTask), ct);
     }
@@ -48,7 +48,7 @@ internal class ConsumerTask<TKey, TValue> : ITask
         _logger.LogInformation($"Subscribed to topic: {_topic}");
     }
     
-    private async Task ConsumerRunAsync(CancellationToken ct)
+    private async Task ConsumeAsync(CancellationToken ct)
     {
         _logger.LogInformation($"Consuming messages from topic: {_topic}");
 
@@ -56,7 +56,7 @@ internal class ConsumerTask<TKey, TValue> : ITask
         {
             try
             {
-                var consumeResult = await ConsumeAsync(ct);
+                var consumeResult = await Task.Run(() => _consumer.Consume(ct), ct);
                 _logger.LogDebug(
                     $"Consumed message from topic: {_topic}. " +
                     $"Message: {JsonSerializer.Serialize(consumeResult.Message.Value)}");
@@ -75,7 +75,7 @@ internal class ConsumerTask<TKey, TValue> : ITask
         _logger.LogInformation($"Stopped message consumption from topic: {_topic}");
     }
     
-    private async Task CommitRunAsync(CancellationToken ct)
+    private async Task CommitAsync(CancellationToken ct)
     {
         _logger.LogInformation($"Committing messages topic: {_topic}");
 
@@ -90,7 +90,7 @@ internal class ConsumerTask<TKey, TValue> : ITask
                     $"Committing message topic: {_topic}. " +
                     $"Message: {JsonSerializer.Serialize(consumeResult.Message.Value)}");
                 
-                _consumer.Commit(consumeResult);
+                await Task.Run(() => _consumer.Commit(consumeResult), ct);
             }
             catch (Exception ex)
             {
@@ -98,9 +98,6 @@ internal class ConsumerTask<TKey, TValue> : ITask
             }
         }
     }
-    
-    private async Task<ConsumeResult<TKey, TValue>> ConsumeAsync(CancellationToken ct)
-        => await Task.Run(() => _consumer.Consume(ct), ct);
     
     private async Task WriteToOutChannelAsync(
         ConsumeResult<TKey, TValue> consumeResult,

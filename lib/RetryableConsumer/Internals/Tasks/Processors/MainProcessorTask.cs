@@ -33,10 +33,19 @@ internal class MainProcessorTask<TKey, TValue> : BaseProcessorTask<TKey, TValue>
     protected override async Task<Result> TryRetry(
         ChannelRequest<TKey, TValue> channelRequest, CancellationToken ct)
     {
-        var message = channelRequest.ConsumeResult.Message;
+        var currentMessage = channelRequest.ConsumeResult.Message;
+
+        var newMessage = new Message<TKey, TValue>
+        {
+            Key = currentMessage.Key,
+            Value = currentMessage.Value,
+            Headers = currentMessage.Headers
+        };
         
-        message.SetLocalRetryCountHeader(1);
-        message.SetOverallRetryCountHeader(1);
+        newMessage.SetLocalRetryCountHeader(1);
+        newMessage.SetOverallRetryCountHeader(1);
+        
+        channelRequest.ConsumeResult.Message = newMessage;
 
         if (OutRetryChannelWriter != null)
         {

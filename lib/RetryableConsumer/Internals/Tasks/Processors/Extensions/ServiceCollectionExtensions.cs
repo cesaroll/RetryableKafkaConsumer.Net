@@ -7,7 +7,20 @@ namespace RetryableConsumer.Internals.Tasks.Processors.Extensions;
 
 internal static class ServiceCollectionExtensions
 {
-    internal static void RegisterMainProcessorTasks<TKey, TValue, THandler>(
+    internal static IServiceCollection RegisterProcessorTasks<TKey, TValue, THandler>(
+        this IServiceCollection services,
+        ServiceProvider serviceProvider,
+        RegistrationConfig config,
+        IChannelStrategy<TKey, TValue> channelStrategy
+        )
+        where THandler : IHandler<TKey, TValue>
+    {
+        services.RegisterMainProcessorTasks<TKey, TValue, THandler>(serviceProvider, config, channelStrategy);
+        
+        return services;
+    }
+    
+    private static void RegisterMainProcessorTasks<TKey, TValue, THandler>(
         this IServiceCollection services,
         ServiceProvider serviceProvider,
         RegistrationConfig config,
