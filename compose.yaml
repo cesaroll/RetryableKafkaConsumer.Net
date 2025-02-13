@@ -13,11 +13,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: "2.0"
-          memory: "1G"
+          cpus: "0.5"
+          memory: "500M"
         reservations:
-          cpus: "1.0"  
-          memory: "512M"
+          cpus: "0.25"  
+          memory: "250M"
     depends_on:
       kafka-init:
         condition: service_completed_successfully

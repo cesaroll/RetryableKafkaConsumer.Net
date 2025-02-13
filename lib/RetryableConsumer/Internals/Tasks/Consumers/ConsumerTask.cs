@@ -14,6 +14,8 @@ internal class ConsumerTask<TKey, TValue> : ITask
     private readonly ChannelWriter<ChannelRequest<TKey, TValue>> _outChannelWriter;
     private readonly ChannelReader<ChannelRequest<TKey, TValue>> _inCommitChannelReader;
     private readonly ILogger<ConsumerTask<TKey, TValue>> _logger;
+    private const int ContinuosErrorLimit = 3;
+    private int _continuousErrorCount = 0;
     
     public ConsumerTask(
         string topic,
@@ -35,8 +37,8 @@ internal class ConsumerTask<TKey, TValue> : ITask
         
         var consumerTask = ConsumerRunAsync(ct);
         var commitTask = CommitRunAsync(ct);
-        
-        await Task.WhenAll(consumerTask, commitTask);
+
+        await Task.Run(() => Task.WhenAll(consumerTask, commitTask), ct);
     }
     
     private void ConsumerSubscribe()
@@ -60,10 +62,12 @@ internal class ConsumerTask<TKey, TValue> : ITask
                     $"Message: {JsonSerializer.Serialize(consumeResult.Message.Value)}");
                 
                 await WriteToOutChannelAsync(consumeResult, ct);
+                _continuousErrorCount = 0;
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
+                await HandleConsumerError();
             }
         }
         
@@ -110,5 +114,32 @@ internal class ConsumerTask<TKey, TValue> : ITask
             var msg = $"Writing to main channel timed out.";
             throw new TimeoutException(msg, ex);
         }
+    }
+
+    private async Task HandleConsumerError()
+    {
+        _continuousErrorCount++;
+        if (_continuousErrorCount > ContinuosErrorLimit)
+            await ReBalanceConsumer(5);
+        else
+            await PauseConsumerAsync(5);
+    }
+    
+    private async Task PauseConsumerAsync(int seconds)
+    {
+        _logger.LogInformation($"Pausing consumer for {seconds} seconds.");
+        _consumer.Pause(_consumer.Assignment);
+        await Task.Delay(TimeSpan.FromSeconds(seconds));
+        _consumer.Resume(_consumer.Assignment);
+        _logger.LogInformation($"Resumed consumer.");
+    }
+
+    private async Task ReBalanceConsumer(int seconds) // TODO: Allow this to happen from an endpoint
+    {
+        _logger.LogInformation("Rebalancing consumer.");
+        _consumer.Close();
+        await Task.Delay(TimeSpan.FromSeconds(seconds));
+        ConsumerSubscribe();
+        _logger.LogInformation($"Rebalanced consumer.");
     }
 }

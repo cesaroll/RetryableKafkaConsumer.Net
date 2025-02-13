@@ -43,7 +43,7 @@ internal abstract class BaseProcessorTask<TKey, TValue> : ITask
 
     private async Task ProcessAsync(CancellationToken ct)
     {
-        Logger.LogInformation("Processor id: {Id}. Task started.", Id);
+        Logger.LogInformation("{Id} started.", Id);
 
         while (!ct.IsCancellationRequested)
         {
