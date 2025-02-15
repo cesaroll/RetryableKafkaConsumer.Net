@@ -5,7 +5,6 @@ using Microsoft.Extensions.Logging;
 using RetryableConsumer.Abstractions.Handlers;
 using RetryableConsumer.Abstractions.Results;
 using RetryableConsumer.Internals.Channels;
-using RetryableConsumer.Internals.Channels.Extensions;
 
 namespace RetryableConsumer.Internals.Tasks.Processors;
 
@@ -58,7 +57,7 @@ internal abstract class BaseProcessorTask<TKey, TValue> : ITask
                 
                 var result = await TryHandleAsync(channelRequest, ct);
                 
-                if (result is not ErrorResult) // TODO: Else, if error result then log error and send to a counter since it would require re-processing/rebalance
+                if (result is not ErrorResult)
                 {
                     await WriteToOutCommitChannelAsync(channelRequest, ct);
                 }
@@ -126,7 +125,7 @@ internal abstract class BaseProcessorTask<TKey, TValue> : ITask
 
         try
         {
-            await DlqChannelWriter.WriteWithTimeOutAsync(channelRequest, ct);
+            await DlqChannelWriter.WriteAsync(channelRequest, ct);
         } 
         catch (OperationCanceledException ex)
         {
@@ -141,7 +140,7 @@ internal abstract class BaseProcessorTask<TKey, TValue> : ITask
     {
         try
         {
-            await ConsumerCommitChannelWriter.WriteWithTimeOutAsync(channelRequest, ct);
+            await ConsumerCommitChannelWriter.WriteAsync(channelRequest, ct);
         } 
         catch (OperationCanceledException ex)
         {

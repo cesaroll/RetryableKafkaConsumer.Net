@@ -2,7 +2,6 @@ using Microsoft.Extensions.Logging;
 using RetryableConsumer.Abstractions.Handlers;
 using RetryableConsumer.Abstractions.Results;
 using RetryableConsumer.Internals.Channels;
-using RetryableConsumer.Internals.Channels.Extensions;
 using RetryableConsumer.Internals.Channels.Strategy;
 using RetryableConsumer.Internals.Tasks.Processors.Extensions;
 
@@ -45,7 +44,7 @@ internal class MainProcessorTask<TKey, TValue> : BaseProcessorTask<TKey, TValue>
         
         try
         {
-            await RetryChannelWriter.WriteWithTimeOutAsync(channelRequest, ct);
+            await RetryChannelWriter.WriteAsync(channelRequest, ct);
             return SuccessResult.Instance;
         } catch (OperationCanceledException ex)
         {

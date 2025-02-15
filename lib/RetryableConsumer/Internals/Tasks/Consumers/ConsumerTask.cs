@@ -3,7 +3,6 @@ using System.Threading.Channels;
 using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using RetryableConsumer.Internals.Channels;
-using RetryableConsumer.Internals.Channels.Extensions;
 
 namespace RetryableConsumer.Internals.Tasks.Consumers;
 
@@ -14,8 +13,6 @@ internal class ConsumerTask<TKey, TValue> : ITask
     private readonly ChannelWriter<ChannelRequest<TKey, TValue>> _outChannelWriter;
     private readonly ChannelReader<ChannelRequest<TKey, TValue>> _inCommitChannelReader;
     private readonly ILogger<ConsumerTask<TKey, TValue>> _logger;
-    private const int ContinuosErrorLimit = 3;
-    private int _continuousErrorCount = 0;
     
     public ConsumerTask(
         string topic,
@@ -61,13 +58,11 @@ internal class ConsumerTask<TKey, TValue> : ITask
                     $"Consumed message from topic: {_topic}. " +
                     $"Message: {JsonSerializer.Serialize(consumeResult.Message.Value)}");
                 
-                await WriteToOutChannelAsync(consumeResult, ct);
-                _continuousErrorCount = 0;
+                await _outChannelWriter.WriteAsync(new ChannelRequest<TKey, TValue>(consumeResult), ct);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, ex.Message);
-                await HandleConsumerError();
             }
         }
         
@@ -97,46 +92,5 @@ internal class ConsumerTask<TKey, TValue> : ITask
                 _logger.LogError(ex, ex.Message);
             }
         }
-    }
-    
-    private async Task WriteToOutChannelAsync(
-        ConsumeResult<TKey, TValue> consumeResult,
-        CancellationToken ct)
-    {
-        try
-        {
-            await _outChannelWriter.WriteWithTimeOutAsync(new ChannelRequest<TKey, TValue>(consumeResult), ct);
-        } catch (OperationCanceledException ex)
-        {
-            var msg = $"Writing to main channel timed out.";
-            throw new TimeoutException(msg, ex);
-        }
-    }
-
-    private async Task HandleConsumerError()
-    {
-        _continuousErrorCount++;
-        if (_continuousErrorCount > ContinuosErrorLimit)
-            await ReBalanceConsumer(5);
-        else
-            await PauseConsumerAsync(5);
-    }
-    
-    private async Task PauseConsumerAsync(int seconds)
-    {
-        _logger.LogInformation($"Pausing consumer for {seconds} seconds.");
-        _consumer.Pause(_consumer.Assignment);
-        await Task.Delay(TimeSpan.FromSeconds(seconds));
-        _consumer.Resume(_consumer.Assignment);
-        _logger.LogInformation($"Resumed consumer.");
-    }
-
-    private async Task ReBalanceConsumer(int seconds) // TODO: Allow this to happen from an endpoint
-    {
-        _logger.LogInformation("Rebalancing consumer.");
-        _consumer.Close();
-        await Task.Delay(TimeSpan.FromSeconds(seconds));
-        ConsumerSubscribe();
-        _logger.LogInformation($"Rebalanced consumer.");
     }
 }

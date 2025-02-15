@@ -4,7 +4,6 @@ using Microsoft.Extensions.Logging;
 using RetryableConsumer.Abstractions.Handlers;
 using RetryableConsumer.Abstractions.Results;
 using RetryableConsumer.Internals.Channels;
-using RetryableConsumer.Internals.Channels.Extensions;
 using RetryableConsumer.Internals.Channels.Strategy;
 using RetryableConsumer.Internals.Tasks.Processors.Extensions;
 
@@ -66,10 +65,9 @@ internal class RetryProcessorTask<TKey, TValue> : BaseProcessorTask<TKey, TValue
         if (channelWriter == null) 
             return await TryDlq(channelRequest, ct);
         
-        
         try
         {
-            await channelWriter.WriteWithTimeOutAsync(channelRequest, ct);
+            await channelWriter.WriteAsync(channelRequest, ct);
             return SuccessResult.Instance;
         } catch (OperationCanceledException ex)
         {
@@ -97,8 +95,15 @@ internal class RetryProcessorTask<TKey, TValue> : BaseProcessorTask<TKey, TValue
             return;
         
         var delay = shouldRunDateTime - currentDateTime;
+        var localRetryCount = message.GetLocalRetryCountHeader();
+        var overallRetryCount = message.GetOverallRetryCountHeader();
         
-        Logger.LogDebug("Processor id: {Id}. Delaying for {Delay}.", Id, delay);
+        Logger.LogDebug(
+            "Processor id: {Id}. " +
+            "Local retry count: {localRetryCount}. " +
+            "Overall retry count: {overallRetryCount}. " +
+            "Delaying for {Delay}.", 
+            Id, localRetryCount, overallRetryCount, delay);
         
         await Task.Delay(delay, ct);
     }

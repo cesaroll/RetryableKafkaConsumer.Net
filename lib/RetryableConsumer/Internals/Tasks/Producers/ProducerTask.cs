@@ -78,7 +78,7 @@ internal class ProducerTask<TKey, TValue> : ITask
         try
         {
             await _producer.ProduceAsync(_topic, message, ct);
-            _logger.LogInformation("Produced message to topic: {_topic}", _topic);
+            _logger.LogDebug("Produced message to topic: {_topic}", _topic);
         } catch (Exception ex)
         {
             var msg = $"An error occurred while producing message to topic: {_topic}";
