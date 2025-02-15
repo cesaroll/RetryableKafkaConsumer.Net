@@ -9,10 +9,12 @@ namespace Harness.Consumers.Handlers;
 public class TestHandler: IValueHandler<TestMessage>
 {
     private readonly ILogger<TestHandler> _logger;
+    private readonly Random _random;
     
     public TestHandler(ILogger<TestHandler> logger)
     {
         _logger = logger;
+        _random = new Random();
     }
 
     public async Task<Result> HandleAsync(ConsumeResult<Ignore, TestMessage> consumeResult, CancellationToken ct)
@@ -21,7 +23,10 @@ public class TestHandler: IValueHandler<TestMessage>
         
         var json = JsonSerializer.Serialize(consumeResult.Message.Value);
         
-        _logger.LogInformation($"Handling message: {json} in topic: {consumeResult.TopicPartitionOffset.Topic}");
+        if (_random.Next(1, 100) == 1)
+        {
+            _logger.LogInformation($"Handling message: {json} in topic: {consumeResult.TopicPartitionOffset.Topic}");    
+        }
 
         await Task.Delay(50, ct);
 
