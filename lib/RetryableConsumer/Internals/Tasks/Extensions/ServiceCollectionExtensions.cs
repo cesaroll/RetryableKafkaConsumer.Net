@@ -23,10 +23,7 @@ internal static class ServiceCollectionExtensions
         
         services.RegisterConsumerTasks(config, channelStrategy, keyDeserializer, valueDeserializer);
         
-        services.RegisterProcessorTasks<TKey, TValue, THandler>(
-            serviceProvider, 
-            config, 
-            channelStrategy);
+        services.RegisterProcessorTasks<TKey, TValue, THandler>(config, channelStrategy);
         
         services.RegisterProducerTasks(serviceProvider, config, channelStrategy);
         

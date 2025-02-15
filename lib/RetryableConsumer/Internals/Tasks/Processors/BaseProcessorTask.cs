@@ -1,5 +1,6 @@
 using System.Text.Json;
 using System.Threading.Channels;
+using Confluent.Kafka;
 using Microsoft.Extensions.Logging;
 using RetryableConsumer.Abstractions.Handlers;
 using RetryableConsumer.Abstractions.Results;
@@ -12,27 +13,27 @@ internal abstract class BaseProcessorTask<TKey, TValue> : ITask
 {
     protected readonly string Id;
     protected readonly IHandler<TKey, TValue> PayloadHandler;
-    protected readonly ChannelReader<ChannelRequest<TKey, TValue>> InRequestChannelReader;
-    protected readonly ChannelWriter<ChannelRequest<TKey, TValue>> OutCommitChannelWriter;
-    protected readonly ChannelWriter<ChannelRequest<TKey, TValue>>? OutRetryChannelWriter;
-    protected readonly ChannelWriter<ChannelRequest<TKey, TValue>>? OutDlqChannelWriter;
+    protected readonly ChannelReader<ChannelRequest<TKey, TValue>> ConsumerChannelReader;
+    protected readonly ChannelWriter<ChannelRequest<TKey, TValue>> ConsumerCommitChannelWriter;
+    protected readonly ChannelWriter<ChannelRequest<TKey, TValue>>? RetryChannelWriter;
+    protected readonly ChannelWriter<ChannelRequest<TKey, TValue>>? DlqChannelWriter;
     protected readonly ILogger<BaseProcessorTask<TKey, TValue>> Logger;
 
     protected BaseProcessorTask(
         string id,
         IHandler<TKey, TValue> payloadHandler,
-        ChannelReader<ChannelRequest<TKey, TValue>> inRequestChannelReader, 
-        ChannelWriter<ChannelRequest<TKey, TValue>> outCommitChannelWriter, 
-        ChannelWriter<ChannelRequest<TKey, TValue>>? outRetryChannelWriter, 
-        ChannelWriter<ChannelRequest<TKey, TValue>>? outDlqChannelWriter, 
+        ChannelReader<ChannelRequest<TKey, TValue>> consumerChannelReader, 
+        ChannelWriter<ChannelRequest<TKey, TValue>> consumerCommitChannelWriter, 
+        ChannelWriter<ChannelRequest<TKey, TValue>>? retryChannelWriter, 
+        ChannelWriter<ChannelRequest<TKey, TValue>>? dlqChannelWriter, 
         ILogger<BaseProcessorTask<TKey, TValue>> logger)
     {
         Id = id;
         PayloadHandler = payloadHandler;
-        InRequestChannelReader = inRequestChannelReader;
-        OutCommitChannelWriter = outCommitChannelWriter;
-        OutRetryChannelWriter = outRetryChannelWriter;
-        OutDlqChannelWriter = outDlqChannelWriter;
+        ConsumerChannelReader = consumerChannelReader;
+        ConsumerCommitChannelWriter = consumerCommitChannelWriter;
+        RetryChannelWriter = retryChannelWriter;
+        DlqChannelWriter = dlqChannelWriter;
         Logger = logger;
     }
 
@@ -53,6 +54,8 @@ internal abstract class BaseProcessorTask<TKey, TValue> : ITask
                 if (channelRequest == null)
                     continue;
                 
+                await BeforeHandleAsync(channelRequest, ct);
+                
                 var result = await TryHandleAsync(channelRequest, ct);
                 
                 if (result is not ErrorResult) // TODO: Else, if error result then log error and send to a counter since it would require re-processing/rebalance
@@ -71,7 +74,7 @@ internal abstract class BaseProcessorTask<TKey, TValue> : ITask
     {
         try
         {
-            var request = await InRequestChannelReader.ReadAsync(ct);
+            var request = await ConsumerChannelReader.ReadAsync(ct);
             var message = request.ConsumeResult.Message;
             Logger.LogDebug(
                 "Processor id: {Id}. " +
@@ -86,7 +89,9 @@ internal abstract class BaseProcessorTask<TKey, TValue> : ITask
 
         return null;
     }
-    
+
+    protected abstract Task BeforeHandleAsync(ChannelRequest<TKey, TValue> channelRequest, CancellationToken ct);
+
     private async Task<Result> TryHandleAsync(ChannelRequest<TKey, TValue> channelRequest, CancellationToken ct)
     {
         try
@@ -109,17 +114,19 @@ internal abstract class BaseProcessorTask<TKey, TValue> : ITask
             return await TryDlq(channelRequest, ct);
         }
     }
-    
+
     protected abstract Task<Result> TryRetry(ChannelRequest<TKey, TValue> channelRequest, CancellationToken ct);
     
     protected async Task<Result> TryDlq(ChannelRequest<TKey, TValue> channelRequest, CancellationToken ct)
     {
-        if (OutDlqChannelWriter == null)
+        if (DlqChannelWriter == null)
             return ErrorResult.Instance;
+
+        channelRequest.ConsumeResult.Message = CreateNewMessage(channelRequest.ConsumeResult.Message);
 
         try
         {
-            await OutDlqChannelWriter.WriteWithTimeOutAsync(channelRequest, ct);
+            await DlqChannelWriter.WriteWithTimeOutAsync(channelRequest, ct);
         } 
         catch (OperationCanceledException ex)
         {
@@ -134,11 +141,19 @@ internal abstract class BaseProcessorTask<TKey, TValue> : ITask
     {
         try
         {
-            await OutCommitChannelWriter.WriteWithTimeOutAsync(channelRequest, ct);
+            await ConsumerCommitChannelWriter.WriteWithTimeOutAsync(channelRequest, ct);
         } 
         catch (OperationCanceledException ex)
         {
             Logger.LogError(ex, "Processor id: {Id}. Writing to commit channel timed out.", Id);
         }
     }
+    
+    protected Message<TKey, TValue> CreateNewMessage(Message<TKey, TValue> message)
+        => new()
+        {
+            Key = message.Key,
+            Value = message.Value,
+            Headers = message.Headers
+        };
 }

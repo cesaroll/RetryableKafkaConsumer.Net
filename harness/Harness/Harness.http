@@ -1,6 +1,6 @@
 @Harness_HostAddress = http://localhost:5257
 
-GET {{Harness_HostAddress}}/weatherforecast/
+GET {{Harness_HostAddress}}/ping
 Accept: application/json
 
 ###

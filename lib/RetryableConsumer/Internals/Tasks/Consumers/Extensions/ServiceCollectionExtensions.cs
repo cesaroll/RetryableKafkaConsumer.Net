@@ -19,6 +19,12 @@ internal static class ServiceCollectionExtensions
             channelStrategy,
             keyDeserializer,
             valueDeserializer);
+        
+        services.RegisterRetryConsumerTasks(
+            config.Retries,
+            channelStrategy,
+            keyDeserializer,
+            valueDeserializer);
 
         return services;
     }
@@ -31,8 +37,8 @@ internal static class ServiceCollectionExtensions
         IDeserializer<TValue> valueDeserializer)
     {
         var topic = config.Topic;
-        var mainChannelWriter = channelStrategy.GetMainChannel().Channel.Writer;
-        var commitChannelReader = channelStrategy.GetCommitChannel().Channel.Reader;
+        var mainChannelWriter = channelStrategy.GetMainConsumerChannel().Channel.Writer;
+        var commitChannelReader = channelStrategy.GetMainCommitChannel().Channel.Reader;
         var consumer = CreateKafkaConsumer(config.Host, config.GroupId, keyDeserializer, valueDeserializer);
 
         services.AddSingleton<ITask>(prov =>
@@ -43,6 +49,31 @@ internal static class ServiceCollectionExtensions
                 mainChannelWriter,
                 commitChannelReader)
         );
+    }
+
+    private static void RegisterRetryConsumerTasks<TKey, TValue>(
+        this IServiceCollection services,
+        List<RetryConfig> retryConfigs,
+        IChannelStrategy<TKey, TValue> channelStrategy,
+        IDeserializer<TKey> keyDeserializer,
+        IDeserializer<TValue> valueDeserializer)
+    {
+        foreach (var config in retryConfigs)
+        {
+            var topic = config.Topic;
+            var channelWriter = channelStrategy.GetRetryConsumerChannel(topic)!.Channel.Writer;
+            var channelReader = channelStrategy.GetRetryConsumerCommitChannel(topic)!.Channel.Reader;
+            var consumer = CreateKafkaConsumer(config.Host, config.GroupId, keyDeserializer, valueDeserializer);
+
+            services.AddSingleton<ITask>(prov =>
+                ActivatorUtilities.CreateInstance<ConsumerTask<TKey, TValue>>(
+                    prov,
+                    topic,
+                    consumer,
+                    channelWriter,
+                    channelReader)
+            );
+        }
     }
     
     private static IConsumer<TKey, TValue> CreateKafkaConsumer<TKey, TValue>(

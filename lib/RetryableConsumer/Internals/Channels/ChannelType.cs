@@ -2,8 +2,10 @@ namespace RetryableConsumer.Internals.Channels;
 
 internal enum ChannelType
 {
-    Main,
-    Commit,
-    Retry,
-    Dlq 
+    MainConsumer,
+    MainConsumerCommit,
+    RetryProducer,
+    DlqProducer,
+    RetryConsumer,
+    RetryConsumerCommit
 }

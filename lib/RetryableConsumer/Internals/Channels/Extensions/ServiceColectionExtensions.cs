@@ -11,21 +11,24 @@ internal static class ServiceColectionExtensions
     public static IServiceCollection RegisterChannels<TKey, TValue>(
         this IServiceCollection services, RegistrationConfig config)
     {
-        services.RegisterMainChannel<TKey, TValue>(config.Main.ChannelCapacity);
-        services.RegisterCommitChannel<TKey, TValue>(config.Main.ChannelCapacity);
-        services.RegistryRetryChannels<TKey, TValue>(config.Retries);
-        services.RegisterDlqChannel<TKey, TValue>(config.Dlq?.ChannelCapacity ?? 1);
+        services.RegisterMainConsumerChannel<TKey, TValue>(config.Main.ChannelCapacity);
+        services.RegisterMainCommitChannel<TKey, TValue>(config.Main.ChannelCapacity);
+        
+        services.RegistryRetryProducerChannels<TKey, TValue>(config.Retries);
+        services.RegisterDlqProducerChannel<TKey, TValue>(config.Dlq?.ChannelCapacity ?? 1);
+        
+        services.RegisterRetryConsumerChannels<TKey, TValue>(config.Retries);
 
         services.TryAddSingleton<IChannelStrategy<TKey, TValue>, ChannelStrategy<TKey, TValue>>();
         
         return services;
     }
 
-    private static void RegisterMainChannel<TKey, TValue>(this IServiceCollection services, int channelCapacity)
+    private static void RegisterMainConsumerChannel<TKey, TValue>(this IServiceCollection services, int channelCapacity)
         => services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
             new ChannelWrapper<TKey, TValue>(
-                id: ChannelType.Main.ToString(), 
-                channelType: ChannelType.Main,
+                id: ChannelType.MainConsumer.ToString(), 
+                channelType: ChannelType.MainConsumer,
                 channel: Channel.CreateBounded<ChannelRequest<TKey, TValue>>(
                     new BoundedChannelOptions(channelCapacity)
                     {
@@ -37,11 +40,11 @@ internal static class ServiceColectionExtensions
             )
         );
     
-    private static void RegisterCommitChannel<TKey, TValue>(this IServiceCollection services, int channelCapacity)
+    private static void RegisterMainCommitChannel<TKey, TValue>(this IServiceCollection services, int channelCapacity)
         => services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
             new ChannelWrapper<TKey, TValue>(
-                id: ChannelType.Commit.ToString(), 
-                channelType: ChannelType.Commit,
+                id: ChannelType.MainConsumerCommit.ToString(), 
+                channelType: ChannelType.MainConsumerCommit,
                 channel: Channel.CreateBounded<ChannelRequest<TKey, TValue>>(
                     new BoundedChannelOptions(channelCapacity)
                     {
@@ -53,14 +56,14 @@ internal static class ServiceColectionExtensions
             )
         );
 
-    private static void RegistryRetryChannels<TKey, TValue>(
+    private static void RegistryRetryProducerChannels<TKey, TValue>(
         this IServiceCollection services,
         List<RetryConfig> retryConfigs)
         => retryConfigs.ForEach(retry => 
             services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
                 new ChannelWrapper<TKey, TValue>(
                     id: retry.Topic, 
-                    channelType: ChannelType.Retry,
+                    channelType: ChannelType.RetryProducer,
                     channel: Channel.CreateBounded<ChannelRequest<TKey, TValue>>(
                         new BoundedChannelOptions(retry.ChannelCapacity)
                         {
@@ -73,11 +76,11 @@ internal static class ServiceColectionExtensions
             )
         );
     
-    private static void RegisterDlqChannel<TKey, TValue>(this IServiceCollection services, int channelCapacity)
+    private static void RegisterDlqProducerChannel<TKey, TValue>(this IServiceCollection services, int channelCapacity)
         => services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
             new ChannelWrapper<TKey, TValue>(
-                id: ChannelType.Dlq.ToString(), 
-                channelType: ChannelType.Dlq,
+                id: ChannelType.DlqProducer.ToString(), 
+                channelType: ChannelType.DlqProducer,
                 channel: Channel.CreateBounded<ChannelRequest<TKey, TValue>>(
                     new BoundedChannelOptions(channelCapacity)
                     {
@@ -88,4 +91,42 @@ internal static class ServiceColectionExtensions
                     })
             )
         );
+    
+    private static void RegisterRetryConsumerChannels<TKey, TValue>(
+        this IServiceCollection services,
+        List<RetryConfig> retryConfigs)
+    {
+        foreach (var config in retryConfigs)
+        {
+            services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
+                new ChannelWrapper<TKey, TValue>(
+                    id: config.Topic, 
+                    channelType: ChannelType.RetryConsumer,
+                    channel: Channel.CreateBounded<ChannelRequest<TKey, TValue>>(
+                        new BoundedChannelOptions(config.ChannelCapacity)
+                        {
+                            SingleWriter = true,
+                            SingleReader = false,
+                            FullMode = BoundedChannelFullMode.Wait,
+                            AllowSynchronousContinuations = false
+                        })
+                )
+            );
+            
+            services.AddSingleton<IChannelWrapper<TKey, TValue>>(_ =>
+                new ChannelWrapper<TKey, TValue>(
+                    id: config.Topic,
+                    channelType: ChannelType.RetryConsumerCommit,
+                    channel: Channel.CreateBounded<ChannelRequest<TKey, TValue>>(
+                        new BoundedChannelOptions(config.ChannelCapacity)
+                        {
+                            SingleWriter = false,
+                            SingleReader = true,
+                            FullMode = BoundedChannelFullMode.Wait,
+                            AllowSynchronousContinuations = false
+                        })
+                )
+            );
+        }
+    }
 }

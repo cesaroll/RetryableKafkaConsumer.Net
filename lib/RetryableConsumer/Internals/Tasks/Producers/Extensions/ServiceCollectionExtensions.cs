@@ -30,7 +30,7 @@ internal static class ServiceCollectionExtensions
                 ActivatorUtilities.CreateInstance<ProducerTask<TKey, TValue>>(
                     prov,
                     config.Topic,
-                    channelStrategy.GetRetryChannel(config.Topic)!.Channel.Reader,
+                    channelStrategy.GetRetryProducerChannel(config.Topic)!.Channel.Reader,
                     CreateKafkaProducer(
                         config.Host,
                         config.InfraRetries,
@@ -49,7 +49,7 @@ internal static class ServiceCollectionExtensions
             ActivatorUtilities.CreateInstance<ProducerTask<TKey, TValue>>(
                 prov,
                 config.Topic,
-                channelStrategy.GetDlqChannel()!.Channel.Reader,
+                channelStrategy.GetDlqProducerChannel()!.Channel.Reader,
                 CreateKafkaProducer(
                     config.Host,
                     config.InfraRetries,
